@@ -1090,6 +1090,16 @@
         });
       }
 
+      function timelineTime(issue) {
+        const parsed = Date.parse(issue.date || "");
+        return Number.isNaN(parsed) ? 0 : parsed;
+      }
+
+      function createdTime(issue) {
+        const parsed = Date.parse(issue.createdAt || "");
+        return Number.isNaN(parsed) ? 0 : parsed;
+      }
+
       function makeId() {
         return "issue-" + Date.now().toString(36);
       }
@@ -1174,6 +1184,15 @@
           localStorage.removeItem(storageKey);
         }
 
+        let changed = false;
+        issues.forEach((issue, index) => {
+          if (!issue.createdAt) {
+            issue.createdAt = issue.updatedAt || new Date(Date.now() - index).toISOString();
+            changed = true;
+          }
+        });
+        if (changed) saveIssues();
+
         if (issues.length === 0) {
           issues = [{
             id: makeId(),
@@ -1183,6 +1202,7 @@
             dek: "A beginning place for thoughts, recommendations, and small life updates.",
             content: "<p>Write the opening note here. This can be as short as a personal update or as polished as a full letter.</p><h2>Journal</h2><p>What has been happening lately?</p><h2>Things Worth Sharing</h2><ul><li>A link, book, song, recipe, place, or idea.</li><li>A tiny observation from the week.</li></ul><blockquote>A line you want to remember.</blockquote><p>End with a sign-off, a question, or a preview of what is next.</p>",
             ...issueStyle(),
+            createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
           }];
           saveIssues();
@@ -1234,6 +1254,7 @@
           primary: fields.issuePrimary.value,
           secondary: fields.issueSecondary.value,
           page: fields.issuePage.value,
+          createdAt: currentIssue()?.createdAt || new Date().toISOString(),
           updatedAt: new Date().toISOString()
         };
       }
@@ -1307,6 +1328,7 @@
           dek: "",
           content: "<h2>Journal</h2><p>Today I want to remember...</p>",
           ...issueStyle(),
+          createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         };
         issues.unshift(issue);
@@ -1323,7 +1345,11 @@
 
         issues
           .slice()
-          .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+          .sort((a, b) => {
+            const dateDiff = timelineTime(b) - timelineTime(a);
+            if (dateDiff !== 0) return dateDiff;
+            return createdTime(b) - createdTime(a);
+          })
           .forEach((issue) => {
             const card = document.createElement("article");
             card.className = "issue-card";
