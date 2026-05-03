@@ -3,20 +3,23 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Newsletter Studio</title>
+    <title>Alice's Notes</title>
     <style>
       :root {
         color-scheme: light;
         --ink: #24201d;
-        --muted: #6f6860;
-        --line: #d9d2c8;
+        --muted: #70685f;
+        --faint: #9b9286;
+        --line: #d8d0c4;
         --paper: #fffdf8;
-        --panel: #f3efe7;
+        --wash: #eee7dd;
+        --panel: #f7f1e8;
         --accent: #2f6f73;
         --accent-dark: #214f52;
         --rose: #b85d55;
-        --gold: #c89b3c;
-        --shadow: 0 16px 40px rgba(36, 32, 29, 0.12);
+        --gold: #b8892f;
+        --green: #687f45;
+        --shadow: 0 18px 42px rgba(36, 32, 29, 0.12);
       }
 
       * {
@@ -25,23 +28,28 @@
 
       body {
         margin: 0;
-        background: #ebe4d9;
+        background: var(--wash);
         color: var(--ink);
         font-family: Georgia, "Times New Roman", serif;
       }
 
       button,
       input,
-      textarea {
+      textarea,
+      select {
         font: inherit;
       }
 
       button {
+        align-items: center;
         border: 1px solid transparent;
         border-radius: 6px;
         background: var(--accent);
         color: #fff;
         cursor: pointer;
+        display: inline-flex;
+        gap: 8px;
+        justify-content: center;
         min-height: 40px;
         padding: 0 14px;
       }
@@ -57,11 +65,174 @@
       }
 
       button.secondary:hover {
-        background: #f7f0e5;
+        background: #f3ecdf;
       }
 
-      .app {
+      button.danger {
+        background: #fff7f3;
+        border-color: #d8b2a9;
+        color: #8a382f;
+      }
+
+      button.danger:hover {
+        background: #f5e0d9;
+      }
+
+      .shell {
         min-height: 100vh;
+      }
+
+      .topbar {
+        align-items: center;
+        background: rgba(247, 241, 232, 0.94);
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        gap: 16px;
+        justify-content: space-between;
+        padding: 16px clamp(16px, 4vw, 40px);
+        position: sticky;
+        top: 0;
+        z-index: 3;
+      }
+
+      .identity h1 {
+        font-size: 28px;
+        font-weight: 400;
+        line-height: 1;
+        margin: 0 0 4px;
+      }
+
+      .identity p,
+      .small-text,
+      .status,
+      .field label,
+      .eyebrow,
+      .meta {
+        color: var(--muted);
+        font-family: Arial, sans-serif;
+      }
+
+      .identity p {
+        font-size: 14px;
+        margin: 0;
+      }
+
+      .view {
+        display: none;
+      }
+
+      .view.active {
+        display: block;
+      }
+
+      .timeline-layout {
+        display: grid;
+        gap: clamp(22px, 4vw, 46px);
+        grid-template-columns: minmax(220px, 300px) minmax(0, 760px);
+        margin: 0 auto;
+        max-width: 1120px;
+        padding: clamp(22px, 5vw, 56px);
+      }
+
+      .timeline-intro {
+        padding-top: 8px;
+      }
+
+      .eyebrow,
+      .meta,
+      .field label {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .timeline-intro h2 {
+        font-size: clamp(36px, 7vw, 64px);
+        font-weight: 400;
+        line-height: 0.95;
+        margin: 8px 0 14px;
+      }
+
+      .timeline-intro p {
+        color: #544c45;
+        font-size: 18px;
+        line-height: 1.55;
+        margin: 0 0 22px;
+      }
+
+      .timeline {
+        border-left: 2px solid var(--line);
+        display: grid;
+        gap: 18px;
+        padding-left: 28px;
+      }
+
+      .timeline-empty {
+        background: var(--paper);
+        border: 1px dashed var(--line);
+        border-radius: 8px;
+        color: var(--muted);
+        font-family: Arial, sans-serif;
+        line-height: 1.5;
+        padding: 28px;
+      }
+
+      .issue-card {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        box-shadow: 0 8px 22px rgba(36, 32, 29, 0.08);
+        display: grid;
+        gap: 12px;
+        padding: 20px;
+        position: relative;
+      }
+
+      .issue-card::before {
+        background: var(--rose);
+        border: 3px solid var(--wash);
+        border-radius: 50%;
+        content: "";
+        height: 14px;
+        left: -37px;
+        position: absolute;
+        top: 24px;
+        width: 14px;
+      }
+
+      .issue-card h3 {
+        font-size: 28px;
+        font-weight: 400;
+        line-height: 1.05;
+        margin: 0;
+      }
+
+      .issue-card p {
+        color: #534b44;
+        font-size: 17px;
+        line-height: 1.45;
+        margin: 0;
+      }
+
+      .tag-row,
+      .card-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .tag {
+        background: #efe2cf;
+        border-radius: 999px;
+        color: #5b4b37;
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 5px 9px;
+      }
+
+      .editor-layout {
         display: grid;
         grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
       }
@@ -69,74 +240,46 @@
       .tools {
         background: var(--panel);
         border-right: 1px solid var(--line);
+        height: calc(100vh - 73px);
+        overflow: auto;
         padding: 24px;
         position: sticky;
-        top: 0;
-        height: 100vh;
-        overflow: auto;
+        top: 73px;
       }
 
-      .brand {
-        margin: 0 0 22px;
-      }
-
-      .brand h1 {
+      .tools h2 {
         font-size: 28px;
+        font-weight: 400;
         line-height: 1.05;
-        margin: 0 0 6px;
-      }
-
-      .brand p {
-        color: var(--muted);
-        font-family: Arial, sans-serif;
-        font-size: 14px;
-        line-height: 1.4;
-        margin: 0;
+        margin: 0 0 16px;
       }
 
       .field {
         display: grid;
         gap: 7px;
-        margin-bottom: 16px;
-      }
-
-      .field label,
-      .section-title {
-        color: var(--muted);
-        font-family: Arial, sans-serif;
-        font-size: 12px;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
+        margin-bottom: 15px;
       }
 
       .field input,
       .field textarea {
-        width: 100%;
+        background: var(--paper);
         border: 1px solid var(--line);
         border-radius: 6px;
-        background: var(--paper);
         color: var(--ink);
         padding: 10px 11px;
+        width: 100%;
       }
 
       .field textarea {
-        min-height: 86px;
+        min-height: 82px;
         resize: vertical;
-      }
-
-      .button-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-        margin: 10px 0 20px;
       }
 
       .format-grid {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
         gap: 8px;
-        margin-bottom: 20px;
+        grid-template-columns: repeat(4, 1fr);
+        margin: 10px 0 18px;
       }
 
       .format-grid button {
@@ -144,13 +287,18 @@
         padding: 0;
       }
 
+      .button-grid {
+        display: grid;
+        gap: 8px;
+        grid-template-columns: 1fr 1fr;
+        margin-bottom: 16px;
+      }
+
       .status {
         border-top: 1px solid var(--line);
-        color: var(--muted);
-        font-family: Arial, sans-serif;
         font-size: 13px;
         line-height: 1.45;
-        padding-top: 16px;
+        padding-top: 14px;
       }
 
       .page-wrap {
@@ -162,7 +310,7 @@
         box-shadow: var(--shadow);
         margin: 0 auto;
         max-width: 860px;
-        min-height: calc(100vh - 68px);
+        min-height: calc(100vh - 141px);
         padding: clamp(28px, 6vw, 64px);
       }
 
@@ -175,20 +323,10 @@
         text-align: center;
       }
 
-      .masthead .kicker,
-      .meta {
-        color: var(--muted);
-        font-family: Arial, sans-serif;
-        font-size: 12px;
-        font-weight: 700;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-      }
-
       .masthead h2 {
-        font-size: clamp(42px, 9vw, 82px);
+        font-size: clamp(40px, 9vw, 78px);
         font-weight: 400;
-        line-height: 0.9;
+        line-height: 0.92;
         margin: 0;
       }
 
@@ -216,6 +354,15 @@
         padding-top: 22px;
       }
 
+      .content h3 {
+        color: var(--green);
+        font-family: Arial, sans-serif;
+        font-size: 15px;
+        letter-spacing: 0.08em;
+        margin: 28px 0 8px;
+        text-transform: uppercase;
+      }
+
       .content p {
         margin: 0 0 18px;
       }
@@ -229,12 +376,17 @@
         padding-left: 18px;
       }
 
+      .content ul {
+        margin: 0 0 20px;
+        padding-left: 22px;
+      }
+
       .content a {
         color: var(--accent-dark);
       }
 
       .content:empty::before {
-        color: #9f9588;
+        color: var(--faint);
         content: "Start writing your newsletter here...";
       }
 
@@ -249,8 +401,14 @@
         text-align: center;
       }
 
-      @media (max-width: 820px) {
-        .app {
+      @media (max-width: 880px) {
+        .topbar {
+          align-items: stretch;
+          flex-direction: column;
+        }
+
+        .timeline-layout,
+        .editor-layout {
           grid-template-columns: 1fr;
         }
 
@@ -273,11 +431,12 @@
           background: #fff;
         }
 
+        .topbar,
         .tools {
           display: none;
         }
 
-        .app {
+        .editor-layout {
           display: block;
         }
 
@@ -294,82 +453,116 @@
     </style>
   </head>
   <body>
-    <main class="app">
-      <aside class="tools" aria-label="Newsletter controls">
-        <div class="brand">
-          <h1>Newsletter Studio</h1>
-          <p>Write, preview, autosave, print, and export a simple newsletter page for GitHub Pages.</p>
+    <main class="shell">
+      <header class="topbar">
+        <div class="identity">
+          <h1>Alice's Notes</h1>
+          <p>Personal newsletters, journal entries, links, and small updates.</p>
         </div>
+        <button type="button" id="new-issue-top">+ Add New</button>
+      </header>
 
-        <div class="field">
-          <label for="newsletter-title">Title</label>
-          <input id="newsletter-title" type="text" value="Alice's Newsletter">
+      <section class="view active" id="timeline-view">
+        <div class="timeline-layout">
+          <aside class="timeline-intro">
+            <div class="eyebrow">Timeline</div>
+            <h2>Letters from lately</h2>
+            <p>A home for finished notes and works in progress. Open an entry to keep writing or start a new one.</p>
+            <button type="button" id="new-issue-side">+ Add New</button>
+          </aside>
+          <div class="timeline" id="timeline"></div>
         </div>
+      </section>
 
-        <div class="field">
-          <label for="newsletter-kicker">Kicker</label>
-          <input id="newsletter-kicker" type="text" value="Monthly Notes">
+      <section class="view" id="editor-view">
+        <div class="editor-layout">
+          <aside class="tools" aria-label="Newsletter controls">
+            <button type="button" id="back-to-timeline" class="secondary">Back to Timeline</button>
+            <h2>Write an Issue</h2>
+
+            <div class="field">
+              <label for="newsletter-title">Title</label>
+              <input id="newsletter-title" type="text">
+            </div>
+
+            <div class="field">
+              <label for="newsletter-kicker">Kicker</label>
+              <input id="newsletter-kicker" type="text">
+            </div>
+
+            <div class="field">
+              <label for="newsletter-date">Issue Date</label>
+              <input id="newsletter-date" type="text">
+            </div>
+
+            <div class="field">
+              <label for="newsletter-tags">Tags</label>
+              <input id="newsletter-tags" type="text" placeholder="journal, links, spring">
+            </div>
+
+            <div class="field">
+              <label for="newsletter-dek">Intro</label>
+              <textarea id="newsletter-dek"></textarea>
+            </div>
+
+            <div class="eyebrow">Components</div>
+            <div class="button-grid">
+              <button type="button" class="secondary" data-insert="journal">Journal</button>
+              <button type="button" class="secondary" data-insert="links">Links</button>
+              <button type="button" class="secondary" data-insert="list">List</button>
+              <button type="button" class="secondary" data-insert="photo">Photo Note</button>
+              <button type="button" class="secondary" data-insert="quote">Quote</button>
+              <button type="button" class="secondary" data-insert="signoff">Sign-off</button>
+            </div>
+
+            <div class="eyebrow">Format</div>
+            <div class="format-grid" aria-label="Formatting controls">
+              <button type="button" data-command="bold" title="Bold"><strong>B</strong></button>
+              <button type="button" data-command="italic" title="Italic"><em>I</em></button>
+              <button type="button" data-block="h2" title="Heading">H2</button>
+              <button type="button" data-block="blockquote" title="Quote">""</button>
+            </div>
+
+            <div class="button-grid">
+              <button type="button" id="save-issue">Save</button>
+              <button type="button" id="print-newsletter" class="secondary">Print</button>
+              <button type="button" id="copy-html" class="secondary">Copy HTML</button>
+              <button type="button" id="download-html" class="secondary">Download</button>
+            </div>
+
+            <button type="button" id="delete-issue" class="danger">Delete Issue</button>
+            <p class="status" id="status">Draft saves automatically in this browser.</p>
+          </aside>
+
+          <section class="page-wrap">
+            <article class="newsletter" id="newsletter">
+              <header class="masthead">
+                <div class="meta" id="preview-kicker"></div>
+                <h2 id="preview-title"></h2>
+                <div class="meta" id="preview-date"></div>
+                <p class="dek" id="preview-dek"></p>
+              </header>
+
+              <div class="content" id="newsletter-content" contenteditable="true"></div>
+
+              <footer class="footer-note">Made with care. Published with GitHub Pages.</footer>
+            </article>
+          </section>
         </div>
-
-        <div class="field">
-          <label for="newsletter-date">Issue Date</label>
-          <input id="newsletter-date" type="text" value="May 2026">
-        </div>
-
-        <div class="field">
-          <label for="newsletter-dek">Intro</label>
-          <textarea id="newsletter-dek">A quiet place for updates, links, reflections, and things worth sharing.</textarea>
-        </div>
-
-        <div class="section-title">Format</div>
-        <div class="format-grid" aria-label="Formatting controls">
-          <button type="button" data-command="bold" title="Bold"><strong>B</strong></button>
-          <button type="button" data-command="italic" title="Italic"><em>I</em></button>
-          <button type="button" data-block="h2" title="Heading">H2</button>
-          <button type="button" data-block="blockquote" title="Quote">“”</button>
-        </div>
-
-        <div class="button-row">
-          <button type="button" id="print-newsletter">Print</button>
-          <button type="button" id="copy-html" class="secondary">Copy HTML</button>
-        </div>
-
-        <div class="button-row">
-          <button type="button" id="download-html" class="secondary">Download</button>
-          <button type="button" id="reset-page" class="secondary">Reset</button>
-        </div>
-
-        <p class="status" id="status">Draft saves automatically in this browser.</p>
-      </aside>
-
-      <section class="page-wrap">
-        <article class="newsletter" id="newsletter">
-          <header class="masthead">
-            <div class="kicker" id="preview-kicker">Monthly Notes</div>
-            <h2 id="preview-title">Alice's Newsletter</h2>
-            <div class="meta" id="preview-date">May 2026</div>
-            <p class="dek" id="preview-dek">A quiet place for updates, links, reflections, and things worth sharing.</p>
-          </header>
-
-          <div class="content" id="newsletter-content" contenteditable="true">
-            <p>Write the opening note here. This can be as short as a personal update or as polished as a full editorial.</p>
-            <h2>Things Worth Sharing</h2>
-            <p>Add links, recommendations, announcements, photos, or anything else that belongs in this issue.</p>
-            <blockquote>Use quotes for memorable lines, reader notes, or a short pull quote from the issue.</blockquote>
-            <p>End with a sign-off, a question for readers, or a preview of what is coming next.</p>
-          </div>
-
-          <footer class="footer-note">Made with care. Published with GitHub Pages.</footer>
-        </article>
       </section>
     </main>
 
     <script>
-      const storageKey = "newsletter-studio-draft-v1";
+      const storageKey = "newsletter-studio-issues-v2";
+      const timelineView = document.querySelector("#timeline-view");
+      const editorView = document.querySelector("#editor-view");
+      const timeline = document.querySelector("#timeline");
+      const status = document.querySelector("#status");
       const fields = {
         title: document.querySelector("#newsletter-title"),
         kicker: document.querySelector("#newsletter-kicker"),
         date: document.querySelector("#newsletter-date"),
+        tags: document.querySelector("#newsletter-tags"),
         dek: document.querySelector("#newsletter-dek"),
         content: document.querySelector("#newsletter-content")
       };
@@ -379,7 +572,40 @@
         date: document.querySelector("#preview-date"),
         dek: document.querySelector("#preview-dek")
       };
-      const status = document.querySelector("#status");
+      const components = {
+        journal: "<h2>Journal</h2><p>Today I keep thinking about...</p>",
+        links: "<h2>Links I Saved</h2><ul><li><a href=\"#\">A link worth keeping</a> - why it mattered.</li><li><a href=\"#\">Another link</a> - a small note.</li></ul>",
+        list: "<h2>A Small List</h2><ul><li>Something I noticed</li><li>Something I made</li><li>Something I want to remember</li></ul>",
+        photo: "<h2>Photo Note</h2><p><strong>Photo:</strong> Add an image here after uploading it to your repo, then write the caption below.</p><p>Caption or memory goes here.</p>",
+        quote: "<blockquote>A line I want to hold onto.</blockquote>",
+        signoff: "<h2>Until Next Time</h2><p>Thanks for reading. More soon.</p>"
+      };
+      let issues = [];
+      let activeId = null;
+
+      function todayLabel() {
+        return new Date().toLocaleDateString(undefined, {
+          month: "long",
+          day: "numeric",
+          year: "numeric"
+        });
+      }
+
+      function makeId() {
+        return "issue-" + Date.now().toString(36);
+      }
+
+      function stripHtml(html) {
+        const node = document.createElement("div");
+        node.innerHTML = html;
+        return node.textContent || "";
+      }
+
+      function escapeHtml(text) {
+        const node = document.createElement("div");
+        node.textContent = text || "";
+        return node.innerHTML;
+      }
 
       function setStatus(message) {
         status.textContent = message;
@@ -389,77 +615,189 @@
         }, 2800);
       }
 
+      function saveIssues() {
+        localStorage.setItem(storageKey, JSON.stringify(issues));
+      }
+
+      function loadIssues() {
+        try {
+          issues = JSON.parse(localStorage.getItem(storageKey)) || [];
+        } catch {
+          issues = [];
+          localStorage.removeItem(storageKey);
+        }
+
+        if (issues.length === 0) {
+          issues = [{
+            id: makeId(),
+            title: "First note",
+            kicker: "Personal Newsletter",
+            date: todayLabel(),
+            tags: "journal, links",
+            dek: "A beginning place for thoughts, recommendations, and small life updates.",
+            content: "<p>Write the opening note here. This can be as short as a personal update or as polished as a full letter.</p><h2>Journal</h2><p>What has been happening lately?</p><h2>Things Worth Sharing</h2><ul><li>A link, book, song, recipe, place, or idea.</li><li>A tiny observation from the week.</li></ul><blockquote>A line you want to remember.</blockquote><p>End with a sign-off, a question, or a preview of what is next.</p>",
+            updatedAt: new Date().toISOString()
+          }];
+          saveIssues();
+        }
+      }
+
+      function currentIssue() {
+        return issues.find((issue) => issue.id === activeId);
+      }
+
       function updatePreview() {
-        preview.title.textContent = fields.title.value || "Untitled Newsletter";
-        preview.kicker.textContent = fields.kicker.value || "Newsletter";
-        preview.date.textContent = fields.date.value || new Date().toLocaleDateString();
+        preview.title.textContent = fields.title.value || "Untitled";
+        preview.kicker.textContent = fields.kicker.value || "Personal Newsletter";
+        preview.date.textContent = fields.date.value || todayLabel();
         preview.dek.textContent = fields.dek.value || "";
       }
 
-      function saveDraft() {
-        updatePreview();
-        const draft = {
-          title: fields.title.value,
-          kicker: fields.kicker.value,
-          date: fields.date.value,
-          dek: fields.dek.value,
-          content: fields.content.innerHTML
+      function readEditor() {
+        return {
+          id: activeId || makeId(),
+          title: fields.title.value.trim() || "Untitled",
+          kicker: fields.kicker.value.trim() || "Personal Newsletter",
+          date: fields.date.value.trim() || todayLabel(),
+          tags: fields.tags.value.trim(),
+          dek: fields.dek.value.trim(),
+          content: fields.content.innerHTML,
+          updatedAt: new Date().toISOString()
         };
-        localStorage.setItem(storageKey, JSON.stringify(draft));
       }
 
-      function loadDraft() {
-        const saved = localStorage.getItem(storageKey);
-        if (!saved) {
-          updatePreview();
+      function saveActiveIssue(showMessage = false) {
+        if (!activeId) return;
+        updatePreview();
+        const next = readEditor();
+        const index = issues.findIndex((issue) => issue.id === activeId);
+        if (index >= 0) {
+          issues[index] = next;
+        } else {
+          issues.unshift(next);
+        }
+        saveIssues();
+        renderTimeline();
+        if (showMessage) setStatus("Issue saved.");
+      }
+
+      function openTimeline() {
+        saveActiveIssue();
+        editorView.classList.remove("active");
+        timelineView.classList.add("active");
+        renderTimeline();
+      }
+
+      function openIssue(id) {
+        activeId = id;
+        const issue = currentIssue();
+        if (!issue) return;
+        fields.title.value = issue.title || "";
+        fields.kicker.value = issue.kicker || "";
+        fields.date.value = issue.date || "";
+        fields.tags.value = issue.tags || "";
+        fields.dek.value = issue.dek || "";
+        fields.content.innerHTML = issue.content || "";
+        updatePreview();
+        timelineView.classList.remove("active");
+        editorView.classList.add("active");
+        fields.content.focus();
+      }
+
+      function newIssue() {
+        const issue = {
+          id: makeId(),
+          title: "Untitled note",
+          kicker: "Personal Newsletter",
+          date: todayLabel(),
+          tags: "journal",
+          dek: "",
+          content: "<h2>Journal</h2><p>Today I want to remember...</p>",
+          updatedAt: new Date().toISOString()
+        };
+        issues.unshift(issue);
+        saveIssues();
+        openIssue(issue.id);
+      }
+
+      function renderTimeline() {
+        timeline.innerHTML = "";
+        if (issues.length === 0) {
+          timeline.innerHTML = "<div class=\"timeline-empty\">No newsletters yet. Add a new one to start your timeline.</div>";
           return;
         }
 
-        try {
-          const draft = JSON.parse(saved);
-          fields.title.value = draft.title || "";
-          fields.kicker.value = draft.kicker || "";
-          fields.date.value = draft.date || "";
-          fields.dek.value = draft.dek || "";
-          fields.content.innerHTML = draft.content || "";
-          updatePreview();
-        } catch {
-          localStorage.removeItem(storageKey);
-        }
+        issues
+          .slice()
+          .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+          .forEach((issue) => {
+            const card = document.createElement("article");
+            card.className = "issue-card";
+            const tags = (issue.tags || "")
+              .split(",")
+              .map((tag) => tag.trim())
+              .filter(Boolean)
+              .map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`)
+              .join("");
+            const excerpt = issue.dek || stripHtml(issue.content).slice(0, 160);
+            card.innerHTML = `
+              <div class="meta">${escapeHtml(issue.date || "Undated")}</div>
+              <h3>${escapeHtml(issue.title || "Untitled")}</h3>
+              <p>${escapeHtml(excerpt || "No preview yet.")}</p>
+              <div class="tag-row">${tags}</div>
+              <div class="card-actions">
+                <button type="button" data-open="${issue.id}">Open</button>
+                <button type="button" class="secondary" data-export="${issue.id}">Download</button>
+              </div>
+            `;
+            timeline.appendChild(card);
+          });
       }
 
-      function buildExportHtml() {
+      function insertHtml(html) {
+        fields.content.focus();
+        document.execCommand("insertHTML", false, html);
+        saveActiveIssue();
+      }
+
+      function buildExportHtml(issue = readEditor()) {
         const source = document.documentElement.cloneNode(true);
-        source.querySelector(".tools")?.remove();
-        source.querySelector(".app").replaceWith(source.querySelector(".newsletter"));
-        source.querySelector("#newsletter-content").removeAttribute("contenteditable");
+        const app = source.querySelector(".shell");
+        app.innerHTML = document.querySelector("#newsletter").outerHTML;
+        const exported = app.querySelector("#newsletter");
+        exported.querySelector("#preview-title").textContent = issue.title;
+        exported.querySelector("#preview-kicker").textContent = issue.kicker;
+        exported.querySelector("#preview-date").textContent = issue.date;
+        exported.querySelector("#preview-dek").textContent = issue.dek;
+        exported.querySelector("#newsletter-content").innerHTML = issue.content;
+        exported.querySelector("#newsletter-content").removeAttribute("contenteditable");
         source.querySelector("script")?.remove();
+        source.querySelector("title").textContent = issue.title;
         return "<!doctype html>\n" + source.outerHTML;
       }
 
+      function downloadIssue(issue = readEditor()) {
+        const slug = (issue.title || "newsletter")
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-|-$/g, "") || "newsletter";
+        const blob = new Blob([buildExportHtml(issue)], { type: "text/html" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = slug + ".html";
+        link.click();
+        URL.revokeObjectURL(link.href);
+      }
+
       Object.values(fields).forEach((field) => {
-        field.addEventListener("input", saveDraft);
+        field.addEventListener("input", () => saveActiveIssue());
       });
 
-      document.querySelectorAll("[data-command]").forEach((button) => {
-        button.addEventListener("click", () => {
-          fields.content.focus();
-          document.execCommand(button.dataset.command, false, null);
-          saveDraft();
-        });
-      });
-
-      document.querySelectorAll("[data-block]").forEach((button) => {
-        button.addEventListener("click", () => {
-          fields.content.focus();
-          document.execCommand("formatBlock", false, button.dataset.block);
-          saveDraft();
-        });
-      });
-
-      document.querySelector("#print-newsletter").addEventListener("click", () => {
-        window.print();
-      });
+      document.querySelector("#new-issue-top").addEventListener("click", newIssue);
+      document.querySelector("#new-issue-side").addEventListener("click", newIssue);
+      document.querySelector("#back-to-timeline").addEventListener("click", openTimeline);
+      document.querySelector("#save-issue").addEventListener("click", () => saveActiveIssue(true));
+      document.querySelector("#print-newsletter").addEventListener("click", () => window.print());
 
       document.querySelector("#copy-html").addEventListener("click", async () => {
         await navigator.clipboard.writeText(buildExportHtml());
@@ -467,22 +805,52 @@
       });
 
       document.querySelector("#download-html").addEventListener("click", () => {
-        const blob = new Blob([buildExportHtml()], { type: "text/html" });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "newsletter.html";
-        link.click();
-        URL.revokeObjectURL(link.href);
+        downloadIssue();
         setStatus("Newsletter HTML downloaded.");
       });
 
-      document.querySelector("#reset-page").addEventListener("click", () => {
-        if (!confirm("Reset this browser draft?")) return;
-        localStorage.removeItem(storageKey);
-        location.reload();
+      document.querySelector("#delete-issue").addEventListener("click", () => {
+        if (!activeId || !confirm("Delete this issue from this browser?")) return;
+        issues = issues.filter((issue) => issue.id !== activeId);
+        activeId = null;
+        saveIssues();
+        openTimeline();
       });
 
-      loadDraft();
+      document.querySelectorAll("[data-command]").forEach((button) => {
+        button.addEventListener("click", () => {
+          fields.content.focus();
+          document.execCommand(button.dataset.command, false, null);
+          saveActiveIssue();
+        });
+      });
+
+      document.querySelectorAll("[data-block]").forEach((button) => {
+        button.addEventListener("click", () => {
+          fields.content.focus();
+          document.execCommand("formatBlock", false, button.dataset.block);
+          saveActiveIssue();
+        });
+      });
+
+      document.querySelectorAll("[data-insert]").forEach((button) => {
+        button.addEventListener("click", () => insertHtml(components[button.dataset.insert]));
+      });
+
+      timeline.addEventListener("click", (event) => {
+        const openButton = event.target.closest("[data-open]");
+        const exportButton = event.target.closest("[data-export]");
+        if (openButton) {
+          openIssue(openButton.dataset.open);
+        }
+        if (exportButton) {
+          const issue = issues.find((item) => item.id === exportButton.dataset.export);
+          if (issue) downloadIssue(issue);
+        }
+      });
+
+      loadIssues();
+      renderTimeline();
     </script>
   </body>
 </html>
