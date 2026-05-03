@@ -14,9 +14,27 @@
         --paper: #fffdf8;
         --wash: #eee7dd;
         --panel: #f7f1e8;
+        --input-bg: #fffdf8;
+        --secondary: #fffaf0;
+        --secondary-hover: #f3ecdf;
+        --button-text: #ffffff;
         --accent: #2f6f73;
         --accent-dark: #214f52;
         --rose: #b85d55;
+        --timeline-line: #d8d0c4;
+        --tag-bg: #efe2cf;
+        --tag-text: #5b4b37;
+        --newsletter-meta: #70685f;
+        --intro: #70685f;
+        --label: #70685f;
+        --section-accent: #687f45;
+        --timeline-copy: #544c45;
+        --card-copy: #534b44;
+        --quote-text: #4f4540;
+        --danger-bg: #fff7f3;
+        --danger-border: #d8b2a9;
+        --danger-text: #8a382f;
+        --danger-hover: #f5e0d9;
         --gold: #b8892f;
         --green: #687f45;
         --shadow: 0 18px 42px rgba(36, 32, 29, 0.12);
@@ -49,7 +67,7 @@
         border: 1px solid transparent;
         border-radius: 6px;
         background: var(--accent);
-        color: #fff;
+        color: var(--button-text);
         cursor: pointer;
         display: inline-flex;
         gap: 8px;
@@ -63,23 +81,23 @@
       }
 
       button.secondary {
-        background: #fffaf0;
+        background: var(--secondary);
         border-color: var(--line);
         color: var(--ink);
       }
 
       button.secondary:hover {
-        background: #f3ecdf;
+        background: var(--secondary-hover);
       }
 
       button.danger {
-        background: #fff7f3;
-        border-color: #d8b2a9;
-        color: #8a382f;
+        background: var(--danger-bg);
+        border-color: var(--danger-border);
+        color: var(--danger-text);
       }
 
       button.danger:hover {
-        background: #f5e0d9;
+        background: var(--danger-hover);
       }
 
       .shell {
@@ -91,7 +109,7 @@
       .field label,
       .eyebrow,
       .meta {
-        color: var(--muted);
+        color: var(--label);
         font-family: Arial, sans-serif;
       }
 
@@ -129,7 +147,7 @@
       }
 
       .login-panel p {
-        color: var(--muted);
+        color: var(--timeline-copy);
         font-size: 18px;
         line-height: 1.45;
         margin: 0 0 24px;
@@ -141,7 +159,7 @@
       }
 
       .auth-error {
-        color: #8a382f;
+        color: var(--danger-text);
         font-family: Arial, sans-serif;
         font-size: 14px;
         min-height: 20px;
@@ -161,7 +179,7 @@
         color: var(--ink);
         min-height: 44px;
         padding: 0;
-        position: fixed;
+        position: fixed !important;
         right: clamp(16px, 3vw, 34px);
         top: clamp(16px, 3vw, 34px);
         width: 44px;
@@ -209,7 +227,7 @@
       }
 
       .timeline-intro p {
-        color: #544c45;
+        color: var(--timeline-copy);
         font-size: clamp(17px, 2vw, 22px);
         line-height: 1.55;
         margin: 0 0 22px;
@@ -229,7 +247,7 @@
       }
 
       .timeline::before {
-        background: var(--line);
+        background: var(--timeline-line);
         content: "";
         height: 2px;
         left: 0;
@@ -243,7 +261,7 @@
         background: var(--paper);
         border: 1px dashed var(--line);
         border-radius: 8px;
-        color: var(--muted);
+        color: var(--timeline-copy);
         font-family: Arial, sans-serif;
         line-height: 1.5;
         min-width: min(560px, calc(100vw - 44px));
@@ -284,7 +302,7 @@
       }
 
       .issue-card p {
-        color: #534b44;
+        color: var(--card-copy);
         font-size: 17px;
         line-height: 1.45;
         margin: 0;
@@ -298,9 +316,9 @@
       }
 
       .tag {
-        background: #efe2cf;
+        background: var(--tag-bg);
         border-radius: 999px;
-        color: #5b4b37;
+        color: var(--tag-text);
         font-family: Arial, sans-serif;
         font-size: 12px;
         font-weight: 700;
@@ -342,7 +360,7 @@
       .field input,
       .field textarea,
       .field select {
-        background: var(--paper);
+        background: var(--input-bg);
         border: 1px solid var(--line);
         border-radius: 6px;
         color: var(--ink);
@@ -401,7 +419,7 @@
       }
 
       .settings-panel p {
-        color: var(--muted);
+        color: var(--timeline-copy);
         font-size: 18px;
         line-height: 1.45;
         margin: 0 0 26px;
@@ -460,6 +478,10 @@
         text-align: center;
       }
 
+      .masthead .meta {
+        color: var(--newsletter-meta);
+      }
+
       .masthead h2 {
         font-size: clamp(40px, 9vw, 78px);
         font-weight: 400;
@@ -468,7 +490,7 @@
       }
 
       .dek {
-        color: var(--muted);
+        color: var(--intro);
         font-size: clamp(19px, 3vw, 25px);
         line-height: 1.35;
         margin: 0 auto;
@@ -492,7 +514,7 @@
       }
 
       .content h3 {
-        color: var(--green);
+        color: var(--section-accent);
         font-family: Arial, sans-serif;
         font-size: 15px;
         letter-spacing: 0.08em;
@@ -506,7 +528,7 @@
 
       .content blockquote {
         border-left: 4px solid var(--rose);
-        color: #4f4540;
+        color: var(--quote-text);
         font-size: 21px;
         line-height: 1.45;
         margin: 26px 0;
@@ -523,13 +545,13 @@
       }
 
       .content:empty::before {
-        color: var(--faint);
+        color: var(--label);
         content: "Start writing your newsletter here...";
       }
 
       .footer-note {
         border-top: 1px solid var(--line);
-        color: var(--muted);
+        color: var(--label);
         font-family: Arial, sans-serif;
         font-size: 13px;
         line-height: 1.45;
@@ -597,7 +619,7 @@
   </head>
   <body>
     <main class="shell">
-      <button type="button" class="gear-button" id="open-settings" aria-label="Open settings" hidden>
+      <button type="button" class="gear-button" id="open-settings" aria-label="Open settings" data-admin-only hidden>
         <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"></path>
           <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.7 1.7 0 0 0 15 19.37a1.7 1.7 0 0 0-1 .23 1.7 1.7 0 0 0-.85 1.47V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 8.3 19.44a1.7 1.7 0 0 0-1-.23 1.7 1.7 0 0 0-1.88.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 2.63 15a1.7 1.7 0 0 0-.23-1A1.7 1.7 0 0 0 .93 13.15H.84a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 2.4 8.3a1.7 1.7 0 0 0 .23-1 1.7 1.7 0 0 0-.34-1.88l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 7 2.63a1.7 1.7 0 0 0 1-.23A1.7 1.7 0 0 0 8.85.93V.84a2 2 0 1 1 4 0v.09A1.7 1.7 0 0 0 13.7 2.4a1.7 1.7 0 0 0 1 .23 1.7 1.7 0 0 0 1.88-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.37 7c.13.32.21.66.23 1a1.7 1.7 0 0 0 1.47.85h.09a2 2 0 1 1 0 4h-.09A1.7 1.7 0 0 0 19.6 13.7c-.02.34-.1.68-.2 1.3Z"></path>
@@ -729,6 +751,10 @@
                 <input id="theme-ink" type="color" data-theme-color="--ink">
               </div>
               <div class="color-field">
+                <label for="theme-label" class="eyebrow">Labels</label>
+                <input id="theme-label" type="color" data-theme-color="--label">
+              </div>
+              <div class="color-field">
                 <label for="theme-background" class="eyebrow">Background</label>
                 <input id="theme-background" type="color" data-theme-color="--wash">
               </div>
@@ -741,12 +767,68 @@
                 <input id="theme-panel" type="color" data-theme-color="--panel">
               </div>
               <div class="color-field">
+                <label for="theme-input" class="eyebrow">Inputs</label>
+                <input id="theme-input" type="color" data-theme-color="--input-bg">
+              </div>
+              <div class="color-field">
+                <label for="theme-line" class="eyebrow">Borders</label>
+                <input id="theme-line" type="color" data-theme-color="--line">
+              </div>
+              <div class="color-field">
                 <label for="theme-accent" class="eyebrow">Accent</label>
                 <input id="theme-accent" type="color" data-theme-color="--accent">
               </div>
               <div class="color-field">
+                <label for="theme-button-text" class="eyebrow">Button Text</label>
+                <input id="theme-button-text" type="color" data-theme-color="--button-text">
+              </div>
+              <div class="color-field">
+                <label for="theme-secondary" class="eyebrow">Beige Buttons</label>
+                <input id="theme-secondary" type="color" data-theme-color="--secondary">
+              </div>
+              <div class="color-field">
                 <label for="theme-rose" class="eyebrow">Timeline Dot</label>
                 <input id="theme-rose" type="color" data-theme-color="--rose">
+              </div>
+              <div class="color-field">
+                <label for="theme-timeline" class="eyebrow">Timeline Line</label>
+                <input id="theme-timeline" type="color" data-theme-color="--timeline-line">
+              </div>
+              <div class="color-field">
+                <label for="theme-tag-bg" class="eyebrow">Tags</label>
+                <input id="theme-tag-bg" type="color" data-theme-color="--tag-bg">
+              </div>
+              <div class="color-field">
+                <label for="theme-tag-text" class="eyebrow">Tag Text</label>
+                <input id="theme-tag-text" type="color" data-theme-color="--tag-text">
+              </div>
+              <div class="color-field">
+                <label for="theme-newsletter-meta" class="eyebrow">Kicker + Date</label>
+                <input id="theme-newsletter-meta" type="color" data-theme-color="--newsletter-meta">
+              </div>
+              <div class="color-field">
+                <label for="theme-intro" class="eyebrow">Intro</label>
+                <input id="theme-intro" type="color" data-theme-color="--intro">
+              </div>
+              <div class="color-field">
+                <label for="theme-section" class="eyebrow">Section Accent</label>
+                <input id="theme-section" type="color" data-theme-color="--section-accent">
+              </div>
+              <div class="color-field">
+                <label for="theme-timeline-copy" class="eyebrow">Timeline Text</label>
+                <input id="theme-timeline-copy" type="color" data-theme-color="--timeline-copy">
+              </div>
+              <div class="color-field">
+                <label for="theme-card-copy" class="eyebrow">Card Text</label>
+                <input id="theme-card-copy" type="color" data-theme-color="--card-copy">
+              </div>
+              <div class="color-field">
+                <label for="theme-quote" class="eyebrow">Quote Text</label>
+                <input id="theme-quote" type="color" data-theme-color="--quote-text">
+              </div>
+              <div class="color-field">
+                <label for="theme-danger" class="eyebrow">Delete Text</label>
+                <input id="theme-danger" type="color" data-theme-color="--danger-text">
               </div>
             </div>
             <div class="button-grid">
@@ -784,9 +866,28 @@
         "--wash": "#eee7dd",
         "--paper": "#fffdf8",
         "--panel": "#f7f1e8",
+        "--input-bg": "#fffdf8",
+        "--secondary": "#fffaf0",
+        "--secondary-hover": "#f3ecdf",
+        "--button-text": "#ffffff",
+        "--line": "#d8d0c4",
         "--accent": "#2f6f73",
         "--accent-dark": "#214f52",
-        "--rose": "#b85d55"
+        "--rose": "#b85d55",
+        "--timeline-line": "#d8d0c4",
+        "--tag-bg": "#efe2cf",
+        "--tag-text": "#5b4b37",
+        "--newsletter-meta": "#70685f",
+        "--intro": "#70685f",
+        "--label": "#70685f",
+        "--section-accent": "#687f45",
+        "--timeline-copy": "#544c45",
+        "--card-copy": "#534b44",
+        "--quote-text": "#4f4540",
+        "--danger-bg": "#fff7f3",
+        "--danger-border": "#d8b2a9",
+        "--danger-text": "#8a382f",
+        "--danger-hover": "#f5e0d9"
       };
       const fields = {
         title: document.querySelector("#newsletter-title"),
@@ -911,6 +1012,7 @@
           theme[input.dataset.themeColor] = input.value;
         });
         theme["--accent-dark"] = theme["--accent"];
+        theme["--secondary-hover"] = theme["--secondary"];
         localStorage.setItem(themeKey, JSON.stringify(theme));
         applyTheme(theme);
       }
