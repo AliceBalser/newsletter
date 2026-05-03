@@ -894,23 +894,7 @@
               <button type="button" class="secondary" data-insert="dots">Dots</button>
               <button type="button" class="secondary" data-insert="space">Space</button>
             </div>
-            <div class="field">
-              <label for="custom-break-text">Custom Break</label>
-              <input id="custom-break-text" type="text" placeholder="A divider label or symbol">
-            </div>
-            <div class="button-grid">
-              <div class="field">
-                <label for="custom-break-quantity">Quantity</label>
-                <input id="custom-break-quantity" type="number" min="1" max="80" value="3">
-              </div>
-              <label class="field">
-                <span class="eyebrow">Full Line</span>
-                <input id="custom-break-full" type="checkbox">
-              </label>
-            </div>
-            <div class="button-grid">
-              <button type="button" class="secondary" id="save-custom-break">Save Break</button>
-            </div>
+            <div class="eyebrow">Saved Breaks</div>
             <div class="button-grid" id="custom-break-list"></div>
 
             <div class="eyebrow">Format</div>
@@ -1018,6 +1002,26 @@
             </div>
             <div class="button-grid">
               <button type="button" class="secondary" id="import-font">Import Font</button>
+              <label class="secondary file-button" for="font-file">Import File</label>
+              <input id="font-file" type="file" accept=".ttf,.otf,.woff,.woff2,font/*" hidden>
+            </div>
+            <div class="eyebrow">Custom Breaks</div>
+            <div class="field">
+              <label for="custom-break-text">Break Item</label>
+              <input id="custom-break-text" type="text" placeholder="*">
+            </div>
+            <div class="button-grid">
+              <div class="field">
+                <label for="custom-break-quantity">Quantity</label>
+                <input id="custom-break-quantity" type="number" min="1" max="80" value="3">
+              </div>
+              <label class="field">
+                <span class="eyebrow">Full Line</span>
+                <input id="custom-break-full" type="checkbox">
+              </label>
+            </div>
+            <div class="button-grid">
+              <button type="button" class="secondary" id="save-custom-break">Save Break</button>
             </div>
             <div class="button-grid">
               <button type="button" id="back-from-settings">Back</button>
@@ -1259,7 +1263,16 @@
 
       function renderFonts() {
         document.querySelectorAll("[data-imported-font-link]").forEach((link) => link.remove());
-        customFonts.forEach((font) => {
+        document.querySelector("#imported-font-faces")?.remove();
+        const fontFaceStyle = document.createElement("style");
+        fontFaceStyle.id = "imported-font-faces";
+        fontFaceStyle.textContent = customFonts
+          .filter((font) => font.dataUrl)
+          .map((font) => `@font-face { font-family: "${font.name.replace(/"/g, '\\"')}"; src: url("${font.dataUrl}"); font-display: swap; }`)
+          .join("\n");
+        document.head.appendChild(fontFaceStyle);
+
+        customFonts.filter((font) => !font.dataUrl).forEach((font) => {
           const link = document.createElement("link");
           link.dataset.importedFontLink = "true";
           link.rel = "stylesheet";
@@ -1284,6 +1297,9 @@
           customFonts = [];
           localStorage.removeItem(fontKey);
         }
+        const before = customFonts.length;
+        customFonts = customFonts.filter((font) => font.name?.toLowerCase() !== "marley antique");
+        if (customFonts.length !== before) saveFonts();
         renderFonts();
       }
 
@@ -1544,16 +1560,37 @@
         selection.addRange(savedRange);
       }
 
+      function styleSavedRange(style) {
+        if (!savedRange) return false;
+        const selection = window.getSelection();
+        restoreEditorSelection();
+        const range = selection.rangeCount ? selection.getRangeAt(0) : savedRange;
+        if (range.collapsed) return false;
+        const span = document.createElement("span");
+        Object.assign(span.style, style);
+        span.appendChild(range.extractContents());
+        range.insertNode(span);
+        selection.removeAllRanges();
+        const nextRange = document.createRange();
+        nextRange.selectNodeContents(span);
+        selection.addRange(nextRange);
+        savedRange = nextRange.cloneRange();
+        return true;
+      }
+
       function applyInlineStyle(command, value) {
         if (!isAdmin()) return;
+        const style = command === "foreColor" ? { color: value } : { fontFamily: value };
+        if (styleSavedRange(style)) {
+          saveActiveIssue();
+          return;
+        }
         restoreEditorSelection();
         const target = savedRange?.commonAncestorContainer;
         const targetElement = target?.nodeType === Node.TEXT_NODE ? target.parentElement : target;
         const editable = targetElement?.closest?.("[contenteditable='true']") || fields.content;
         editable.focus();
-        if (command === "foreColor") {
-          document.execCommand("styleWithCSS", false, true);
-        }
+        document.execCommand("styleWithCSS", false, true);
         document.execCommand(command, false, value);
         saveEditorSelection();
         saveActiveIssue();
@@ -1661,6 +1698,23 @@
         saveFonts();
         renderFonts();
         nameInput.value = "";
+      });
+      document.querySelector("#font-file").addEventListener("change", (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+        const nameInput = document.querySelector("#font-family-name");
+        const nameFromFile = file.name.replace(/\.(ttf|otf|woff2?|TTF|OTF|WOFF2?)$/, "").replace(/[-_]+/g, " ");
+        const name = nameInput.value.trim() || nameFromFile;
+        const reader = new FileReader();
+        reader.addEventListener("load", () => {
+          customFonts = customFonts.filter((font) => font.name.toLowerCase() !== name.toLowerCase());
+          customFonts.push({ name, dataUrl: reader.result });
+          saveFonts();
+          renderFonts();
+          nameInput.value = "";
+        });
+        reader.readAsDataURL(file);
+        event.target.value = "";
       });
       document.querySelector("#text-font").addEventListener("change", (event) => {
         applyInlineStyle("fontName", event.target.value || "Georgia");
