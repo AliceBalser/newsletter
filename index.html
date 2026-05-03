@@ -380,6 +380,8 @@
       .editor-layout {
         display: grid;
         grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+        height: 100vh;
+        overflow: hidden;
       }
 
       .editor-layout.readonly {
@@ -388,10 +390,28 @@
 
       .tools {
         background: var(--panel);
-        height: auto;
-        overflow: visible;
+        height: 100vh;
+        overflow: auto;
         padding: 24px;
         position: static;
+        scrollbar-color: var(--secondary) transparent;
+        scrollbar-width: thin;
+      }
+
+      .tools::-webkit-scrollbar,
+      .page-wrap::-webkit-scrollbar {
+        width: 10px;
+      }
+
+      .tools::-webkit-scrollbar-track,
+      .page-wrap::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      .tools::-webkit-scrollbar-thumb,
+      .page-wrap::-webkit-scrollbar-thumb {
+        background: var(--secondary);
+        border-radius: 999px;
       }
 
       .tools h2 {
@@ -513,7 +533,11 @@
       }
 
       .page-wrap {
+        height: 100vh;
+        overflow: auto;
         padding: 34px;
+        scrollbar-color: var(--secondary) transparent;
+        scrollbar-width: thin;
       }
 
       .newsletter {
@@ -625,8 +649,35 @@
         font-family: Arial, sans-serif;
         font-size: 13px;
         letter-spacing: 0.12em;
+        position: relative;
         text-align: center;
         text-transform: uppercase;
+      }
+
+      .custom-break-button {
+        position: relative;
+      }
+
+      .custom-break-button .delete-break {
+        align-items: center;
+        background: var(--danger-bg);
+        border-radius: 999px;
+        color: var(--danger-text);
+        display: none;
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        height: 20px;
+        justify-content: center;
+        min-height: 20px;
+        padding: 0;
+        position: absolute;
+        right: -6px;
+        top: -6px;
+        width: 20px;
+      }
+
+      .custom-break-button:hover .delete-break {
+        display: inline-flex;
       }
 
       .content .font-serif {
@@ -693,6 +744,8 @@
       @media (max-width: 880px) {
         .editor-layout {
           grid-template-columns: 1fr;
+          height: auto;
+          overflow: visible;
         }
 
         .timeline-layout {
@@ -710,10 +763,13 @@
 
         .tools {
           height: auto;
+          overflow: visible;
           position: static;
         }
 
         .page-wrap {
+          height: auto;
+          overflow: visible;
           padding: 16px;
         }
 
@@ -825,7 +881,7 @@
             <div class="eyebrow">Newsletter Colors</div>
             <div class="button-grid">
               <div class="field">
-                <label for="issue-page">Page</label>
+                <label for="issue-page">Page Colour</label>
                 <input id="issue-page" type="color">
               </div>
             </div>
@@ -841,6 +897,16 @@
             <div class="field">
               <label for="custom-break-text">Custom Break</label>
               <input id="custom-break-text" type="text" placeholder="A divider label or symbol">
+            </div>
+            <div class="button-grid">
+              <div class="field">
+                <label for="custom-break-quantity">Quantity</label>
+                <input id="custom-break-quantity" type="number" min="1" max="80" value="3">
+              </div>
+              <label class="field">
+                <span class="eyebrow">Full Line</span>
+                <input id="custom-break-full" type="checkbox">
+              </label>
             </div>
             <div class="button-grid">
               <button type="button" class="secondary" id="save-custom-break">Save Break</button>
@@ -867,8 +933,6 @@
               <button type="button" data-command="italic" title="Italic"><em>I</em></button>
               <button type="button" data-block="h2" title="Heading">Heading</button>
               <button type="button" data-block="blockquote" title="Quote">""</button>
-              <button type="button" id="move-block-up" title="Move selected block up">Move Up</button>
-              <button type="button" id="move-block-down" title="Move selected block down">Move Down</button>
             </div>
 
             <div class="eyebrow">Images</div>
@@ -889,10 +953,10 @@
           <section class="page-wrap">
             <article class="newsletter" id="newsletter">
               <header class="masthead">
-                <div class="meta" id="preview-kicker"></div>
-                <h2 id="preview-title"></h2>
-                <div class="meta" id="preview-date"></div>
-                <p class="dek" id="preview-dek"></p>
+                <div class="meta rich-meta" id="preview-kicker" contenteditable="true"></div>
+                <h2 id="preview-title" contenteditable="true"></h2>
+                <div class="meta rich-meta" id="preview-date" contenteditable="true"></div>
+                <p class="dek" id="preview-dek" contenteditable="true"></p>
               </header>
 
               <div class="content" id="newsletter-content" contenteditable="true"></div>
@@ -1038,6 +1102,7 @@
         date: document.querySelector("#preview-date"),
         dek: document.querySelector("#preview-dek")
       };
+      const richAreas = [preview.title, preview.kicker, preview.date, preview.dek, fields.content];
       const components = {
         list: "<h2>A Small List</h2><ul><li>Something I noticed</li><li>Something I made</li><li>Something I want to remember</li></ul>",
         signoff: "<h2>Until Next Time</h2><p>Thanks for reading. More soon.</p>",
@@ -1073,6 +1138,9 @@
         guestBackButton.hidden = role !== "guest" || !editorView.classList.contains("active");
         guestDownloadButton.hidden = role !== "guest" || !editorView.classList.contains("active");
         fields.content.contentEditable = isAdmin() ? "true" : "false";
+        [preview.title, preview.kicker, preview.date, preview.dek].forEach((item) => {
+          item.contentEditable = isAdmin() ? "true" : "false";
+        });
         document.querySelector(".tools").hidden = !isAdmin();
         document.querySelector(".editor-layout").classList.toggle("readonly", !isAdmin());
       }
@@ -1224,12 +1292,13 @@
 
       function renderCustomBreaks() {
         customBreakList.innerHTML = "";
-        customBreaks.forEach((text, index) => {
+        customBreaks.forEach((item, index) => {
+          const text = typeof item === "string" ? item : item.text;
           const button = document.createElement("button");
           button.type = "button";
-          button.className = "secondary";
+          button.className = "secondary custom-break-button";
           button.dataset.customBreak = String(index);
-          button.textContent = text;
+          button.innerHTML = `${escapeHtml(text)}<span class="delete-break" data-delete-break="${index}" title="Delete">x</span>`;
           customBreakList.appendChild(button);
         });
       }
@@ -1295,6 +1364,13 @@
         });
       }
 
+      function setPreviewFromIssue(issue) {
+        preview.title.innerHTML = issue.titleHtml || escapeHtml(issue.title || "Untitled");
+        preview.kicker.innerHTML = issue.kickerHtml || escapeHtml(issue.kicker || "Personal Newsletter");
+        preview.date.innerHTML = issue.dateHtml || escapeHtml(issue.date || todayLabel());
+        preview.dek.innerHTML = issue.dekHtml || escapeHtml(issue.dek || "");
+      }
+
       function issueStyle(issue = {}) {
         return {
           page: issue.page || defaultTheme["--paper"]
@@ -1314,10 +1390,14 @@
         if (!isAdmin()) return currentIssue();
         return {
           id: activeId || makeId(),
-          title: fields.title.value.trim() || "Untitled",
-          kicker: fields.kicker.value.trim() || "Personal Newsletter",
-          date: fields.date.value.trim() || todayLabel(),
-          dek: fields.dek.value.trim(),
+          title: preview.title.textContent.trim() || fields.title.value.trim() || "Untitled",
+          kicker: preview.kicker.textContent.trim() || fields.kicker.value.trim() || "Personal Newsletter",
+          date: preview.date.textContent.trim() || fields.date.value.trim() || todayLabel(),
+          dek: preview.dek.textContent.trim() || fields.dek.value.trim(),
+          titleHtml: preview.title.innerHTML,
+          kickerHtml: preview.kicker.innerHTML,
+          dateHtml: preview.date.innerHTML,
+          dekHtml: preview.dek.innerHTML,
           content: fields.content.innerHTML,
           page: fields.issuePage.value,
           createdAt: currentIssue()?.createdAt || new Date().toISOString(),
@@ -1358,7 +1438,8 @@
         fields.content.innerHTML = issue.content || "";
         const style = issueStyle(issue);
         fields.issuePage.value = style.page;
-        updatePreview();
+        setPreviewFromIssue(issue);
+        applyIssueStyle(style);
         showOnly(editorView);
         lastView = "editor";
         syncRoleUi();
@@ -1434,7 +1515,10 @@
       function insertHtml(html) {
         if (!isAdmin()) return;
         restoreEditorSelection();
-        fields.content.focus();
+        const target = savedRange?.commonAncestorContainer;
+        const targetElement = target?.nodeType === Node.TEXT_NODE ? target.parentElement : target;
+        const editable = targetElement?.closest?.("[contenteditable='true']") || fields.content;
+        editable.focus();
         document.execCommand("insertHTML", false, html);
         saveEditorSelection();
         saveActiveIssue();
@@ -1442,12 +1526,12 @@
 
       function selectionInsideEditor() {
         const selection = window.getSelection();
-        return selection.rangeCount && fields.content.contains(selection.anchorNode);
+        return selection.rangeCount && richAreas.some((area) => area.contains(selection.anchorNode));
       }
 
       function saveEditorSelection() {
         const selection = window.getSelection();
-        if (selection.rangeCount && fields.content.contains(selection.anchorNode)) {
+        if (selection.rangeCount && richAreas.some((area) => area.contains(selection.anchorNode))) {
           savedRange = selection.getRangeAt(0).cloneRange();
         }
       }
@@ -1462,7 +1546,13 @@
       function applyInlineStyle(command, value) {
         if (!isAdmin()) return;
         restoreEditorSelection();
-        fields.content.focus();
+        const target = savedRange?.commonAncestorContainer;
+        const targetElement = target?.nodeType === Node.TEXT_NODE ? target.parentElement : target;
+        const editable = targetElement?.closest?.("[contenteditable='true']") || fields.content;
+        editable.focus();
+        if (command === "foreColor") {
+          document.execCommand("styleWithCSS", false, true);
+        }
         document.execCommand(command, false, value);
         saveEditorSelection();
         saveActiveIssue();
@@ -1474,66 +1564,16 @@
         insertHtml(`<figure><img src="${safeSrc}" alt=""><figcaption>Caption</figcaption></figure><p><br></p>`);
       }
 
-      function insertCustomBreak(text) {
-        const safeText = escapeHtml(text);
+      function customBreakText(item) {
+        const text = typeof item === "string" ? item : item.text;
+        const quantity = typeof item === "string" ? 3 : Number(item.quantity || 1);
+        if (typeof item !== "string" && item.full) return text.repeat(30);
+        return text.repeat(Math.max(1, quantity));
+      }
+
+      function insertCustomBreak(item) {
+        const safeText = escapeHtml(customBreakText(item));
         insertHtml(`<div class="break-custom" contenteditable="false">${safeText}</div><p><br></p>`);
-      }
-
-      function selectedContentBlock() {
-        restoreEditorSelection();
-        const selection = window.getSelection();
-        if (!selection.rangeCount) return null;
-        let node = selection.anchorNode;
-        if (!fields.content.contains(node)) return null;
-        if (node.nodeType === Node.TEXT_NODE) node = node.parentElement;
-        return node.closest("h2, h3, p, blockquote, ul, ol, .break-line, .break-dots, .break-space");
-      }
-
-      function sectionFromSelection() {
-        const block = selectedContentBlock();
-        if (!block) return null;
-        if (block.matches("h2")) return block;
-        let current = block.previousElementSibling;
-        while (current) {
-          if (current.matches("h2")) return current;
-          current = current.previousElementSibling;
-        }
-        return block;
-      }
-
-      function sectionNodes(sectionStart) {
-        if (!sectionStart) return [];
-        const nodes = [sectionStart];
-        if (!sectionStart.matches("h2")) return nodes;
-        let current = sectionStart.nextElementSibling;
-        while (current && !current.matches("h2")) {
-          nodes.push(current);
-          current = current.nextElementSibling;
-        }
-        return nodes;
-      }
-
-      function applySectionFont(fontClass) {
-        if (!isAdmin() || !fontClass) return;
-        const nodes = sectionNodes(sectionFromSelection());
-        nodes.forEach((node) => {
-          node.classList.remove("font-serif", "font-sans", "font-mono", "font-cursive");
-          node.classList.add(fontClass);
-        });
-        saveActiveIssue();
-      }
-
-      function moveSelectedBlock(direction) {
-        if (!isAdmin()) return;
-        const block = selectedContentBlock();
-        if (!block) return;
-        if (direction < 0 && block.previousElementSibling) {
-          fields.content.insertBefore(block, block.previousElementSibling);
-        }
-        if (direction > 0 && block.nextElementSibling) {
-          fields.content.insertBefore(block.nextElementSibling, block);
-        }
-        saveActiveIssue();
       }
 
       function buildExportHtml(issue = readEditor()) {
@@ -1543,15 +1583,16 @@
         app.innerHTML = document.querySelector("#newsletter").outerHTML;
         const exported = app.querySelector("#newsletter");
         exported.querySelector("#preview-title").textContent = issue.title;
-        exported.querySelector("#preview-kicker").textContent = issue.kicker;
-        exported.querySelector("#preview-date").textContent = issue.date;
-        exported.querySelector("#preview-dek").textContent = issue.dek;
+        exported.querySelector("#preview-title").innerHTML = issue.titleHtml || escapeHtml(issue.title);
+        exported.querySelector("#preview-kicker").innerHTML = issue.kickerHtml || escapeHtml(issue.kicker);
+        exported.querySelector("#preview-date").innerHTML = issue.dateHtml || escapeHtml(issue.date);
+        exported.querySelector("#preview-dek").innerHTML = issue.dekHtml || escapeHtml(issue.dek);
         exported.querySelector("#newsletter-content").innerHTML = issue.content;
         const style = issueStyle(issue);
         exported.style.setProperty("--issue-primary", defaultTheme["--ink"]);
         exported.style.setProperty("--issue-secondary", defaultTheme["--ink"]);
         exported.style.setProperty("--issue-page", style.page);
-        exported.querySelector("#newsletter-content").removeAttribute("contenteditable");
+        exported.querySelectorAll("[contenteditable]").forEach((node) => node.removeAttribute("contenteditable"));
         source.querySelector("script")?.remove();
         source.querySelector("title").textContent = issue.title;
         return "<!doctype html>\n" + source.outerHTML;
@@ -1571,12 +1612,21 @@
         URL.revokeObjectURL(link.href);
       }
 
-      Object.values(fields).forEach((field) => {
+      [fields.title, fields.kicker, fields.date, fields.dek, fields.issuePage].forEach((field) => {
+        field.addEventListener("input", () => {
+          updatePreview();
+          saveActiveIssue();
+        });
+      });
+      fields.content.addEventListener("input", () => saveActiveIssue());
+      [preview.title, preview.kicker, preview.date, preview.dek].forEach((field) => {
         field.addEventListener("input", () => saveActiveIssue());
       });
-      fields.content.addEventListener("mouseup", saveEditorSelection);
-      fields.content.addEventListener("keyup", saveEditorSelection);
-      fields.content.addEventListener("focus", saveEditorSelection);
+      richAreas.forEach((area) => {
+        area.addEventListener("mouseup", saveEditorSelection);
+        area.addEventListener("keyup", saveEditorSelection);
+        area.addEventListener("focus", saveEditorSelection);
+      });
 
       loginForm.addEventListener("submit", (event) => {
         event.preventDefault();
@@ -1628,20 +1678,34 @@
       });
       document.querySelector("#save-custom-break").addEventListener("click", () => {
         const input = document.querySelector("#custom-break-text");
+        const quantityInput = document.querySelector("#custom-break-quantity");
+        const fullInput = document.querySelector("#custom-break-full");
         const text = input.value.trim();
         if (!text) return;
-        customBreaks.push(text);
+        customBreaks.push({
+          text,
+          quantity: Number(quantityInput.value || 1),
+          full: fullInput.checked
+        });
         saveBreaks();
         renderCustomBreaks();
         input.value = "";
+        quantityInput.value = "3";
+        fullInput.checked = false;
       });
       customBreakList.addEventListener("click", (event) => {
+        const deleteButton = event.target.closest("[data-delete-break]");
+        if (deleteButton) {
+          event.stopPropagation();
+          customBreaks.splice(Number(deleteButton.dataset.deleteBreak), 1);
+          saveBreaks();
+          renderCustomBreaks();
+          return;
+        }
         const button = event.target.closest("[data-custom-break]");
         if (!button) return;
         insertCustomBreak(customBreaks[Number(button.dataset.customBreak)]);
       });
-      document.querySelector("#move-block-up").addEventListener("click", () => moveSelectedBlock(-1));
-      document.querySelector("#move-block-down").addEventListener("click", () => moveSelectedBlock(1));
       themeInputs.forEach((input) => {
         input.addEventListener("input", saveTheme);
       });

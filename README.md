@@ -23,7 +23,7 @@ GitHub will give you a public URL after the first deploy finishes.
 - Use **Add New** to open the writing space.
 - Write directly in the newsletter body.
 - Use the component buttons for lists, sign-offs, and line breaks.
-- Save custom line breaks, move selected blocks up/down, style selected text or future typing, import online fonts, and insert uploaded images.
+- Save custom line breaks, style selected text or future typing, import online fonts, and insert uploaded images.
 - Edit the title, kicker, date, and intro in the left panel.
 - Drafts and timeline entries save automatically in the current browser.
 - Use the gear button to change the app theme colors.
