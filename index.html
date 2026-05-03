@@ -389,6 +389,10 @@
         margin: 0 0 16px;
       }
 
+      #back-to-timeline {
+        margin-bottom: 18px;
+      }
+
       .field {
         display: grid;
         gap: 7px;
@@ -403,6 +407,11 @@
         border-radius: 6px;
         color: var(--ink);
         padding: 10px 11px;
+        width: 100%;
+      }
+
+      .compact-select {
+        margin: 10px 0 18px;
         width: 100%;
       }
 
@@ -567,6 +576,51 @@
         line-height: 1.45;
         margin: 26px 0;
         padding: 16px 18px;
+      }
+
+      .content .break-line,
+      .content .break-dots,
+      .content .break-space {
+        clear: both;
+        margin: 28px 0;
+        min-height: 18px;
+      }
+
+      .content .break-line {
+        background: currentColor;
+        height: 2px;
+        min-height: 2px;
+        opacity: 0.28;
+      }
+
+      .content .break-dots {
+        color: var(--issue-secondary, var(--label));
+        letter-spacing: 0.45em;
+        text-align: center;
+      }
+
+      .content .break-dots::before {
+        content: "...";
+      }
+
+      .content .break-space {
+        height: 42px;
+      }
+
+      .content .font-serif {
+        font-family: Georgia, "Times New Roman", serif;
+      }
+
+      .content .font-sans {
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      .content .font-mono {
+        font-family: "Courier New", Courier, monospace;
+      }
+
+      .content .font-cursive {
+        font-family: "Brush Script MT", "Segoe Script", cursive;
       }
 
       .content ul {
@@ -749,14 +803,26 @@
               <button type="button" class="secondary" data-insert="photo">Photo Note</button>
               <button type="button" class="secondary" data-insert="quote">Quote</button>
               <button type="button" class="secondary" data-insert="signoff">Sign-off</button>
+              <button type="button" class="secondary" data-insert="line">Line</button>
+              <button type="button" class="secondary" data-insert="dots">Dots</button>
+              <button type="button" class="secondary" data-insert="space">Space</button>
             </div>
 
             <div class="eyebrow">Format</div>
+            <select id="section-font" class="compact-select" aria-label="Section font">
+              <option value="">Section Font</option>
+              <option value="font-serif">Serif</option>
+              <option value="font-sans">Sans</option>
+              <option value="font-mono">Mono</option>
+              <option value="font-cursive">Script</option>
+            </select>
             <div class="format-grid" aria-label="Formatting controls">
               <button type="button" data-command="bold" title="Bold"><strong>B</strong></button>
               <button type="button" data-command="italic" title="Italic"><em>I</em></button>
               <button type="button" data-block="h2" title="Heading">H2</button>
               <button type="button" data-block="blockquote" title="Quote">""</button>
+              <button type="button" id="move-block-up" title="Move up">Up</button>
+              <button type="button" id="move-block-down" title="Move down">Down</button>
             </div>
 
             <div class="button-grid">
@@ -912,7 +978,10 @@
         list: "<h2>A Small List</h2><ul><li>Something I noticed</li><li>Something I made</li><li>Something I want to remember</li></ul>",
         photo: "<h2>Photo Note</h2><p><strong>Photo:</strong> Add an image here after uploading it to your repo, then write the caption below.</p><p>Caption or memory goes here.</p>",
         quote: "<blockquote>A line I want to hold onto.</blockquote>",
-        signoff: "<h2>Until Next Time</h2><p>Thanks for reading. More soon.</p>"
+        signoff: "<h2>Until Next Time</h2><p>Thanks for reading. More soon.</p>",
+        line: "<div class=\"break-line\" contenteditable=\"false\"></div><p><br></p>",
+        dots: "<div class=\"break-dots\" contenteditable=\"false\"></div><p><br></p>",
+        space: "<div class=\"break-space\" contenteditable=\"false\"></div><p><br></p>"
       };
       let issues = [];
       let activeId = null;
@@ -1225,6 +1294,62 @@
         saveActiveIssue();
       }
 
+      function selectedContentBlock() {
+        const selection = window.getSelection();
+        if (!selection.rangeCount) return null;
+        let node = selection.anchorNode;
+        if (!fields.content.contains(node)) return null;
+        if (node.nodeType === Node.TEXT_NODE) node = node.parentElement;
+        return node.closest("h2, h3, p, blockquote, ul, ol, .break-line, .break-dots, .break-space");
+      }
+
+      function sectionFromSelection() {
+        const block = selectedContentBlock();
+        if (!block) return null;
+        if (block.matches("h2")) return block;
+        let current = block.previousElementSibling;
+        while (current) {
+          if (current.matches("h2")) return current;
+          current = current.previousElementSibling;
+        }
+        return block;
+      }
+
+      function sectionNodes(sectionStart) {
+        if (!sectionStart) return [];
+        const nodes = [sectionStart];
+        if (!sectionStart.matches("h2")) return nodes;
+        let current = sectionStart.nextElementSibling;
+        while (current && !current.matches("h2")) {
+          nodes.push(current);
+          current = current.nextElementSibling;
+        }
+        return nodes;
+      }
+
+      function applySectionFont(fontClass) {
+        if (!isAdmin() || !fontClass) return;
+        const nodes = sectionNodes(sectionFromSelection());
+        nodes.forEach((node) => {
+          node.classList.remove("font-serif", "font-sans", "font-mono", "font-cursive");
+          node.classList.add(fontClass);
+        });
+        saveActiveIssue();
+      }
+
+      function moveSelectedBlock(direction) {
+        if (!isAdmin()) return;
+        const block = selectedContentBlock();
+        if (!block) return;
+        if (direction < 0 && block.previousElementSibling) {
+          fields.content.insertBefore(block, block.previousElementSibling);
+        }
+        if (direction > 0 && block.nextElementSibling) {
+          fields.content.insertBefore(block.nextElementSibling, block);
+        }
+        saveActiveIssue();
+      }
+
       function buildExportHtml(issue = readEditor()) {
         if (!issue) return "";
         const source = document.documentElement.cloneNode(true);
@@ -1286,6 +1411,12 @@
       document.querySelector("#save-issue").addEventListener("click", () => saveActiveIssue(true));
       document.querySelector("#open-settings").addEventListener("click", openSettings);
       document.querySelector("#back-from-settings").addEventListener("click", closeSettings);
+      document.querySelector("#section-font").addEventListener("change", (event) => {
+        applySectionFont(event.target.value);
+        event.target.value = "";
+      });
+      document.querySelector("#move-block-up").addEventListener("click", () => moveSelectedBlock(-1));
+      document.querySelector("#move-block-down").addEventListener("click", () => moveSelectedBlock(1));
       themeInputs.forEach((input) => {
         input.addEventListener("input", saveTheme);
       });
