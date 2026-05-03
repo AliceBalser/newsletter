@@ -592,7 +592,8 @@
 
       .content .break-line,
       .content .break-dots,
-      .content .break-space {
+      .content .break-space,
+      .content .break-custom {
         clear: both;
         margin: 28px 0;
         min-height: 18px;
@@ -617,6 +618,15 @@
 
       .content .break-space {
         height: 42px;
+      }
+
+      .content .break-custom {
+        color: var(--label);
+        font-family: Arial, sans-serif;
+        font-size: 13px;
+        letter-spacing: 0.12em;
+        text-align: center;
+        text-transform: uppercase;
       }
 
       .content .font-serif {
@@ -815,14 +825,6 @@
             <div class="eyebrow">Newsletter Colors</div>
             <div class="button-grid">
               <div class="field">
-                <label for="issue-primary">Text</label>
-                <input id="issue-primary" type="color">
-              </div>
-              <div class="field">
-                <label for="issue-secondary">Details</label>
-                <input id="issue-secondary" type="color">
-              </div>
-              <div class="field">
                 <label for="issue-page">Page</label>
                 <input id="issue-page" type="color">
               </div>
@@ -830,16 +832,20 @@
 
             <div class="eyebrow">Components</div>
             <div class="button-grid">
-              <button type="button" class="secondary" data-insert="journal">Journal</button>
-              <button type="button" class="secondary" data-insert="links">Links</button>
               <button type="button" class="secondary" data-insert="list">List</button>
-              <button type="button" class="secondary" data-insert="photo">Photo Note</button>
-              <button type="button" class="secondary" data-insert="quote">Quote</button>
               <button type="button" class="secondary" data-insert="signoff">Sign-off</button>
               <button type="button" class="secondary" data-insert="line">Line</button>
               <button type="button" class="secondary" data-insert="dots">Dots</button>
               <button type="button" class="secondary" data-insert="space">Space</button>
             </div>
+            <div class="field">
+              <label for="custom-break-text">Custom Break</label>
+              <input id="custom-break-text" type="text" placeholder="A divider label or symbol">
+            </div>
+            <div class="button-grid">
+              <button type="button" class="secondary" id="save-custom-break">Save Break</button>
+            </div>
+            <div class="button-grid" id="custom-break-list"></div>
 
             <div class="eyebrow">Format</div>
             <div class="field">
@@ -859,19 +865,14 @@
             <div class="format-grid" aria-label="Formatting controls">
               <button type="button" data-command="bold" title="Bold"><strong>B</strong></button>
               <button type="button" data-command="italic" title="Italic"><em>I</em></button>
-              <button type="button" data-block="h2" title="Heading">H2</button>
+              <button type="button" data-block="h2" title="Heading">Heading</button>
               <button type="button" data-block="blockquote" title="Quote">""</button>
-              <button type="button" id="move-block-up" title="Move up">Up</button>
-              <button type="button" id="move-block-down" title="Move down">Down</button>
+              <button type="button" id="move-block-up" title="Move selected block up">Move Up</button>
+              <button type="button" id="move-block-down" title="Move selected block down">Move Down</button>
             </div>
 
             <div class="eyebrow">Images</div>
-            <div class="field">
-              <label for="image-url">Image URL</label>
-              <input id="image-url" type="url" placeholder="https://...">
-            </div>
             <div class="button-grid">
-              <button type="button" class="secondary" id="insert-image-url">Insert URL</button>
               <label class="secondary file-button" for="image-file">Upload File</label>
               <input id="image-file" type="file" accept="image/*" hidden>
             </div>
@@ -946,6 +947,18 @@
                 <input id="theme-timeline-marker" type="color" data-theme-color="--rose">
               </div>
             </div>
+            <div class="eyebrow">Online Fonts</div>
+            <div class="field">
+              <label for="font-family-name">Font Name</label>
+              <input id="font-family-name" type="text" placeholder="Playfair Display">
+            </div>
+            <div class="field">
+              <label for="font-css-url">CSS or Google Fonts URL</label>
+              <input id="font-css-url" type="url" placeholder="https://fonts.googleapis.com/css2?...">
+            </div>
+            <div class="button-grid">
+              <button type="button" class="secondary" id="import-font">Import Font</button>
+            </div>
             <div class="button-grid">
               <button type="button" id="back-from-settings">Back</button>
               <button type="button" id="settings-logout" class="secondary">Log Out</button>
@@ -958,6 +971,8 @@
     <script>
       const storageKey = "newsletter-studio-issues-v2";
       const themeKey = "newsletter-studio-theme-v1";
+      const fontKey = "newsletter-studio-fonts-v1";
+      const breakKey = "newsletter-studio-breaks-v1";
       const authKey = "newsletter-studio-role-v1";
       const passwords = {
         guest: "family84:)",
@@ -979,6 +994,8 @@
       const guestDownloadButton = document.querySelector("#guest-download");
       const settingsButton = document.querySelector("#open-settings");
       const themeInputs = document.querySelectorAll("[data-theme-color]");
+      const customBreakList = document.querySelector("#custom-break-list");
+      const fontSelect = document.querySelector("#text-font");
       const defaultTheme = {
         "--ink": "#24201d",
         "--wash": "#eee7dd",
@@ -1013,8 +1030,6 @@
         date: document.querySelector("#newsletter-date"),
         dek: document.querySelector("#newsletter-dek"),
         content: document.querySelector("#newsletter-content"),
-        issuePrimary: document.querySelector("#issue-primary"),
-        issueSecondary: document.querySelector("#issue-secondary"),
         issuePage: document.querySelector("#issue-page")
       };
       const preview = {
@@ -1024,17 +1039,15 @@
         dek: document.querySelector("#preview-dek")
       };
       const components = {
-        journal: "<h2>Journal</h2><p>Today I keep thinking about...</p>",
-        links: "<h2>Links I Saved</h2><ul><li><a href=\"#\">A link worth keeping</a> - why it mattered.</li><li><a href=\"#\">Another link</a> - a small note.</li></ul>",
         list: "<h2>A Small List</h2><ul><li>Something I noticed</li><li>Something I made</li><li>Something I want to remember</li></ul>",
-        photo: "<h2>Photo Note</h2><p><strong>Photo:</strong> Add an image here after uploading it to your repo, then write the caption below.</p><p>Caption or memory goes here.</p>",
-        quote: "<blockquote>A line I want to hold onto.</blockquote>",
         signoff: "<h2>Until Next Time</h2><p>Thanks for reading. More soon.</p>",
         line: "<div class=\"break-line\" contenteditable=\"false\"></div><p><br></p>",
         dots: "<div class=\"break-dots\" contenteditable=\"false\"></div><p><br></p>",
         space: "<div class=\"break-space\" contenteditable=\"false\"></div><p><br></p>"
       };
       let issues = [];
+      let customFonts = [];
+      let customBreaks = [];
       let activeId = null;
       let lastView = "timeline";
       let role = null;
@@ -1172,6 +1185,65 @@
         applyTheme(theme);
       }
 
+      function saveFonts() {
+        localStorage.setItem(fontKey, JSON.stringify(customFonts));
+      }
+
+      function renderFonts() {
+        document.querySelector("#imported-fonts")?.remove();
+        const style = document.createElement("style");
+        style.id = "imported-fonts";
+        style.textContent = customFonts
+          .map((font) => `@import url("${font.url.replace(/"/g, "%22")}");`)
+          .join("\n");
+        document.head.appendChild(style);
+
+        fontSelect.querySelectorAll("[data-custom-font]").forEach((option) => option.remove());
+        customFonts.forEach((font) => {
+          const option = document.createElement("option");
+          option.dataset.customFont = "true";
+          option.value = `'${font.name.replace(/'/g, "\\'")}', sans-serif`;
+          option.textContent = font.name;
+          fontSelect.appendChild(option);
+        });
+      }
+
+      function loadFonts() {
+        try {
+          customFonts = JSON.parse(localStorage.getItem(fontKey)) || [];
+        } catch {
+          customFonts = [];
+          localStorage.removeItem(fontKey);
+        }
+        renderFonts();
+      }
+
+      function saveBreaks() {
+        localStorage.setItem(breakKey, JSON.stringify(customBreaks));
+      }
+
+      function renderCustomBreaks() {
+        customBreakList.innerHTML = "";
+        customBreaks.forEach((text, index) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "secondary";
+          button.dataset.customBreak = String(index);
+          button.textContent = text;
+          customBreakList.appendChild(button);
+        });
+      }
+
+      function loadBreaks() {
+        try {
+          customBreaks = JSON.parse(localStorage.getItem(breakKey)) || [];
+        } catch {
+          customBreaks = [];
+          localStorage.removeItem(breakKey);
+        }
+        renderCustomBreaks();
+      }
+
       function saveIssues() {
         localStorage.setItem(storageKey, JSON.stringify(issues));
       }
@@ -1200,7 +1272,7 @@
             kicker: "Personal Newsletter",
             date: todayLabel(),
             dek: "A beginning place for thoughts, recommendations, and small life updates.",
-            content: "<p>Write the opening note here. This can be as short as a personal update or as polished as a full letter.</p><h2>Journal</h2><p>What has been happening lately?</p><h2>Things Worth Sharing</h2><ul><li>A link, book, song, recipe, place, or idea.</li><li>A tiny observation from the week.</li></ul><blockquote>A line you want to remember.</blockquote><p>End with a sign-off, a question, or a preview of what is next.</p>",
+            content: "<p>Write the opening note here. This can be as short as a personal update or as polished as a full letter.</p><h2>Things Worth Sharing</h2><ul><li>A link, book, song, recipe, place, or idea.</li><li>A tiny observation from the week.</li></ul><p>End with a sign-off, a question, or a preview of what is next.</p>",
             ...issueStyle(),
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
@@ -1219,27 +1291,23 @@
         preview.date.textContent = fields.date.value || todayLabel();
         preview.dek.textContent = fields.dek.value || "";
         applyIssueStyle({
-          primary: fields.issuePrimary.value,
-          secondary: fields.issueSecondary.value,
           page: fields.issuePage.value
         });
       }
 
       function issueStyle(issue = {}) {
         return {
-          primary: issue.primary || defaultTheme["--ink"],
-          secondary: issue.secondary || defaultTheme["--label"],
           page: issue.page || defaultTheme["--paper"]
         };
       }
 
       function applyIssueStyle(style) {
         const newsletter = document.querySelector("#newsletter");
-        newsletter.style.setProperty("--issue-primary", style.primary || defaultTheme["--ink"]);
-        newsletter.style.setProperty("--issue-secondary", style.secondary || defaultTheme["--label"]);
+        newsletter.style.setProperty("--issue-primary", defaultTheme["--ink"]);
+        newsletter.style.setProperty("--issue-secondary", defaultTheme["--ink"]);
         newsletter.style.setProperty("--issue-page", style.page || defaultTheme["--paper"]);
         const textColor = document.querySelector("#text-color");
-        if (textColor) textColor.value = style.primary || defaultTheme["--ink"];
+        if (textColor) textColor.value = defaultTheme["--ink"];
       }
 
       function readEditor() {
@@ -1251,8 +1319,6 @@
           date: fields.date.value.trim() || todayLabel(),
           dek: fields.dek.value.trim(),
           content: fields.content.innerHTML,
-          primary: fields.issuePrimary.value,
-          secondary: fields.issueSecondary.value,
           page: fields.issuePage.value,
           createdAt: currentIssue()?.createdAt || new Date().toISOString(),
           updatedAt: new Date().toISOString()
@@ -1291,8 +1357,6 @@
         fields.dek.value = issue.dek || "";
         fields.content.innerHTML = issue.content || "";
         const style = issueStyle(issue);
-        fields.issuePrimary.value = style.primary;
-        fields.issueSecondary.value = style.secondary;
         fields.issuePage.value = style.page;
         updatePreview();
         showOnly(editorView);
@@ -1326,7 +1390,7 @@
           kicker: "Personal Newsletter",
           date: todayLabel(),
           dek: "",
-          content: "<h2>Journal</h2><p>Today I want to remember...</p>",
+          content: "<p>Today I want to remember...</p>",
           ...issueStyle(),
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
@@ -1346,9 +1410,9 @@
         issues
           .slice()
           .sort((a, b) => {
-            const dateDiff = timelineTime(b) - timelineTime(a);
+            const dateDiff = timelineTime(a) - timelineTime(b);
             if (dateDiff !== 0) return dateDiff;
-            return createdTime(b) - createdTime(a);
+            return createdTime(a) - createdTime(b);
           })
           .forEach((issue) => {
             const card = document.createElement("article");
@@ -1408,6 +1472,11 @@
         if (!isAdmin() || !src) return;
         const safeSrc = src.replace(/"/g, "&quot;");
         insertHtml(`<figure><img src="${safeSrc}" alt=""><figcaption>Caption</figcaption></figure><p><br></p>`);
+      }
+
+      function insertCustomBreak(text) {
+        const safeText = escapeHtml(text);
+        insertHtml(`<div class="break-custom" contenteditable="false">${safeText}</div><p><br></p>`);
       }
 
       function selectedContentBlock() {
@@ -1479,8 +1548,8 @@
         exported.querySelector("#preview-dek").textContent = issue.dek;
         exported.querySelector("#newsletter-content").innerHTML = issue.content;
         const style = issueStyle(issue);
-        exported.style.setProperty("--issue-primary", style.primary);
-        exported.style.setProperty("--issue-secondary", style.secondary);
+        exported.style.setProperty("--issue-primary", defaultTheme["--ink"]);
+        exported.style.setProperty("--issue-secondary", defaultTheme["--ink"]);
         exported.style.setProperty("--issue-page", style.page);
         exported.querySelector("#newsletter-content").removeAttribute("contenteditable");
         source.querySelector("script")?.remove();
@@ -1531,16 +1600,23 @@
       document.querySelector("#save-issue").addEventListener("click", () => saveActiveIssue(true));
       document.querySelector("#open-settings").addEventListener("click", openSettings);
       document.querySelector("#back-from-settings").addEventListener("click", closeSettings);
+      document.querySelector("#import-font").addEventListener("click", () => {
+        const nameInput = document.querySelector("#font-family-name");
+        const urlInput = document.querySelector("#font-css-url");
+        const name = nameInput.value.trim();
+        const url = urlInput.value.trim();
+        if (!name || !url) return;
+        customFonts.push({ name, url });
+        saveFonts();
+        renderFonts();
+        nameInput.value = "";
+        urlInput.value = "";
+      });
       document.querySelector("#text-font").addEventListener("change", (event) => {
         applyInlineStyle("fontName", event.target.value || "Georgia");
       });
       document.querySelector("#text-color").addEventListener("input", (event) => {
         applyInlineStyle("foreColor", event.target.value);
-      });
-      document.querySelector("#insert-image-url").addEventListener("click", () => {
-        const input = document.querySelector("#image-url");
-        insertImage(input.value.trim());
-        input.value = "";
       });
       document.querySelector("#image-file").addEventListener("change", (event) => {
         const file = event.target.files[0];
@@ -1549,6 +1625,20 @@
         reader.addEventListener("load", () => insertImage(reader.result));
         reader.readAsDataURL(file);
         event.target.value = "";
+      });
+      document.querySelector("#save-custom-break").addEventListener("click", () => {
+        const input = document.querySelector("#custom-break-text");
+        const text = input.value.trim();
+        if (!text) return;
+        customBreaks.push(text);
+        saveBreaks();
+        renderCustomBreaks();
+        input.value = "";
+      });
+      customBreakList.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-custom-break]");
+        if (!button) return;
+        insertCustomBreak(customBreaks[Number(button.dataset.customBreak)]);
       });
       document.querySelector("#move-block-up").addEventListener("click", () => moveSelectedBlock(-1));
       document.querySelector("#move-block-down").addEventListener("click", () => moveSelectedBlock(1));
@@ -1605,6 +1695,8 @@
       });
 
       loadTheme();
+      loadFonts();
+      loadBreaks();
       loadIssues();
       role = sessionStorage.getItem(authKey);
       if (role === "guest" || role === "admin") {

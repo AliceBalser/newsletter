@@ -19,11 +19,11 @@ GitHub will give you a public URL after the first deploy finishes.
 - Guest can view and download newsletters.
 - Admin can add, edit, delete, download, change timeline/settings theme colors, and set newsletter-specific page/text colors.
 - The page opens to a timeline of saved newsletter issues.
-- Timeline cards stay in chronological order by issue date.
+- Timeline cards stay in chronological order by issue date, oldest on the left and newest on the right.
 - Use **Add New** to open the writing space.
 - Write directly in the newsletter body.
-- Use the component buttons for journal sections, links, lists, photo notes, quotes, and sign-offs.
-- Add line, dot, or space breaks, move selected blocks up/down, style selected text or future typing, and insert images.
+- Use the component buttons for lists, sign-offs, and line breaks.
+- Save custom line breaks, move selected blocks up/down, style selected text or future typing, import online fonts, and insert uploaded images.
 - Edit the title, kicker, date, and intro in the left panel.
 - Drafts and timeline entries save automatically in the current browser.
 - Use the gear button to change the app theme colors.
