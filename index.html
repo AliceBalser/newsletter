@@ -26,6 +26,10 @@
         box-sizing: border-box;
       }
 
+      [hidden] {
+        display: none !important;
+      }
+
       body {
         margin: 0;
         background: var(--wash);
@@ -99,6 +103,50 @@
         display: block;
       }
 
+      .auth-page {
+        align-items: center;
+        display: grid;
+        min-height: 100vh;
+        padding: 24px;
+      }
+
+      .login-panel {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+        margin: 0 auto;
+        max-width: 440px;
+        padding: clamp(24px, 5vw, 40px);
+        width: 100%;
+      }
+
+      .login-panel h1 {
+        font-size: clamp(42px, 8vw, 68px);
+        font-weight: 400;
+        line-height: 0.95;
+        margin: 0 0 12px;
+      }
+
+      .login-panel p {
+        color: var(--muted);
+        font-size: 18px;
+        line-height: 1.45;
+        margin: 0 0 24px;
+      }
+
+      .login-actions {
+        display: grid;
+        gap: 10px;
+      }
+
+      .auth-error {
+        color: #8a382f;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        min-height: 20px;
+      }
+
       .timeline-layout {
         display: grid;
         gap: clamp(26px, 5vw, 58px);
@@ -117,6 +165,13 @@
         right: clamp(16px, 3vw, 34px);
         top: clamp(16px, 3vw, 34px);
         width: 44px;
+        z-index: 4;
+      }
+
+      .logout-button {
+        bottom: clamp(16px, 3vw, 34px);
+        left: clamp(16px, 3vw, 34px);
+        position: fixed;
         z-index: 4;
       }
 
@@ -257,6 +312,10 @@
         grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
       }
 
+      .editor-layout.readonly {
+        display: block;
+      }
+
       .tools {
         background: var(--panel);
         border-right: 1px solid var(--line);
@@ -281,7 +340,8 @@
       }
 
       .field input,
-      .field textarea {
+      .field textarea,
+      .field select {
         background: var(--paper);
         border: 1px solid var(--line);
         border-radius: 6px;
@@ -537,21 +597,46 @@
   </head>
   <body>
     <main class="shell">
-      <button type="button" class="gear-button" id="open-settings" aria-label="Open settings">
+      <button type="button" class="gear-button" id="open-settings" aria-label="Open settings" hidden>
         <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"></path>
           <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.7 1.7 0 0 0 15 19.37a1.7 1.7 0 0 0-1 .23 1.7 1.7 0 0 0-.85 1.47V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 8.3 19.44a1.7 1.7 0 0 0-1-.23 1.7 1.7 0 0 0-1.88.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 2.63 15a1.7 1.7 0 0 0-.23-1A1.7 1.7 0 0 0 .93 13.15H.84a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 2.4 8.3a1.7 1.7 0 0 0 .23-1 1.7 1.7 0 0 0-.34-1.88l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 7 2.63a1.7 1.7 0 0 0 1-.23A1.7 1.7 0 0 0 8.85.93V.84a2 2 0 1 1 4 0v.09A1.7 1.7 0 0 0 13.7 2.4a1.7 1.7 0 0 0 1 .23 1.7 1.7 0 0 0 1.88-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.37 7c.13.32.21.66.23 1a1.7 1.7 0 0 0 1.47.85h.09a2 2 0 1 1 0 4h-.09A1.7 1.7 0 0 0 19.6 13.7c-.02.34-.1.68-.2 1.3Z"></path>
         </svg>
       </button>
+      <button type="button" class="logout-button secondary" id="logout" hidden>Log Out</button>
 
-      <section class="view active" id="timeline-view">
+      <section class="view active" id="login-view">
+        <div class="auth-page">
+          <form class="login-panel" id="login-form">
+            <h1>Letters from lately</h1>
+            <p>Sign in to read the timeline or manage newsletter entries.</p>
+            <div class="field">
+              <label for="login-user">User</label>
+              <select id="login-user">
+                <option value="guest">Guest</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="login-password">Password</label>
+              <input id="login-password" type="password" autocomplete="current-password">
+            </div>
+            <div class="login-actions">
+              <button type="submit">Enter</button>
+              <div class="auth-error" id="auth-error" aria-live="polite"></div>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section class="view" id="timeline-view">
         <div class="timeline-layout">
           <aside class="timeline-intro">
             <div>
               <h2>Letters from lately</h2>
               <p>A home for finished notes and works in progress. Open an entry to keep writing or start a new one.</p>
             </div>
-            <button type="button" id="new-issue-side">+ Add New</button>
+            <button type="button" id="new-issue-side" data-admin-only>+ Add New</button>
           </aside>
           <div class="timeline" id="timeline"></div>
         </div>
@@ -607,11 +692,11 @@
             </div>
 
             <div class="button-grid">
-              <button type="button" id="save-issue">Save</button>
-              <button type="button" id="download-html" class="secondary">Download</button>
+              <button type="button" id="save-issue" data-admin-only>Save</button>
+              <button type="button" id="download-html" class="secondary" data-admin-only>Download</button>
             </div>
 
-            <button type="button" id="delete-issue" class="danger">Delete Issue</button>
+            <button type="button" id="delete-issue" class="danger" data-admin-only>Delete Issue</button>
             <p class="status" id="status">Draft saves automatically in this browser.</p>
           </aside>
 
@@ -676,11 +761,23 @@
     <script>
       const storageKey = "newsletter-studio-issues-v2";
       const themeKey = "newsletter-studio-theme-v1";
+      const authKey = "newsletter-studio-role-v1";
+      const passwords = {
+        guest: "family84:)",
+        admin: "pretzel$$3"
+      };
+      const loginView = document.querySelector("#login-view");
       const timelineView = document.querySelector("#timeline-view");
       const editorView = document.querySelector("#editor-view");
       const settingsView = document.querySelector("#settings-view");
       const timeline = document.querySelector("#timeline");
       const status = document.querySelector("#status");
+      const authError = document.querySelector("#auth-error");
+      const loginForm = document.querySelector("#login-form");
+      const loginUser = document.querySelector("#login-user");
+      const loginPassword = document.querySelector("#login-password");
+      const logoutButton = document.querySelector("#logout");
+      const settingsButton = document.querySelector("#open-settings");
       const themeInputs = document.querySelectorAll("[data-theme-color]");
       const defaultTheme = {
         "--ink": "#24201d",
@@ -716,6 +813,46 @@
       let issues = [];
       let activeId = null;
       let lastView = "timeline";
+      let role = null;
+
+      function isAdmin() {
+        return role === "admin";
+      }
+
+      function showOnly(view) {
+        [loginView, timelineView, editorView, settingsView].forEach((item) => {
+          item.classList.toggle("active", item === view);
+        });
+      }
+
+      function syncRoleUi() {
+        document.querySelectorAll("[data-admin-only]").forEach((item) => {
+          item.hidden = !isAdmin();
+        });
+        settingsButton.hidden = !isAdmin();
+        logoutButton.hidden = !role;
+        fields.content.contentEditable = isAdmin() ? "true" : "false";
+        document.querySelector(".tools").hidden = !isAdmin();
+        document.querySelector(".editor-layout").classList.toggle("readonly", !isAdmin());
+      }
+
+      function signIn(nextRole) {
+        role = nextRole;
+        sessionStorage.setItem(authKey, role);
+        syncRoleUi();
+        showOnly(timelineView);
+        renderTimeline();
+      }
+
+      function signOut() {
+        saveActiveIssue();
+        role = null;
+        activeId = null;
+        sessionStorage.removeItem(authKey);
+        syncRoleUi();
+        loginPassword.value = "";
+        showOnly(loginView);
+      }
 
       function todayLabel() {
         return new Date().toLocaleDateString(undefined, {
@@ -817,6 +954,7 @@
       }
 
       function readEditor() {
+        if (!isAdmin()) return currentIssue();
         return {
           id: activeId || makeId(),
           title: fields.title.value.trim() || "Untitled",
@@ -830,7 +968,7 @@
       }
 
       function saveActiveIssue(showMessage = false) {
-        if (!activeId) return;
+        if (!isAdmin() || !activeId) return;
         updatePreview();
         const next = readEditor();
         const index = issues.findIndex((issue) => issue.id === activeId);
@@ -849,6 +987,7 @@
         settingsView.classList.remove("active");
         editorView.classList.remove("active");
         timelineView.classList.add("active");
+        loginView.classList.remove("active");
         lastView = "timeline";
         renderTimeline();
       }
@@ -864,14 +1003,14 @@
         fields.dek.value = issue.dek || "";
         fields.content.innerHTML = issue.content || "";
         updatePreview();
-        timelineView.classList.remove("active");
-        settingsView.classList.remove("active");
-        editorView.classList.add("active");
+        showOnly(editorView);
         lastView = "editor";
-        fields.content.focus();
+        syncRoleUi();
+        if (isAdmin()) fields.content.focus();
       }
 
       function openSettings() {
+        if (!isAdmin()) return;
         if (settingsView.classList.contains("active")) return;
         saveActiveIssue();
         lastView = editorView.classList.contains("active") ? "editor" : "timeline";
@@ -891,6 +1030,7 @@
       }
 
       function newIssue() {
+        if (!isAdmin()) return;
         const issue = {
           id: makeId(),
           title: "Untitled note",
@@ -933,7 +1073,7 @@
               <div class="tag-row">${tags}</div>
               <div class="card-actions">
                 <button type="button" data-open="${issue.id}">Open</button>
-                <button type="button" class="secondary" data-export="${issue.id}">Download</button>
+                ${isAdmin() ? `<button type="button" class="secondary" data-export="${issue.id}">Download</button>` : ""}
               </div>
             `;
             timeline.appendChild(card);
@@ -941,12 +1081,14 @@
       }
 
       function insertHtml(html) {
+        if (!isAdmin()) return;
         fields.content.focus();
         document.execCommand("insertHTML", false, html);
         saveActiveIssue();
       }
 
       function buildExportHtml(issue = readEditor()) {
+        if (!issue) return "";
         const source = document.documentElement.cloneNode(true);
         const app = source.querySelector(".shell");
         app.innerHTML = document.querySelector("#newsletter").outerHTML;
@@ -963,6 +1105,7 @@
       }
 
       function downloadIssue(issue = readEditor()) {
+        if (!isAdmin() || !issue) return;
         const slug = (issue.title || "newsletter")
           .toLowerCase()
           .replace(/[^a-z0-9]+/g, "-")
@@ -979,6 +1122,18 @@
         field.addEventListener("input", () => saveActiveIssue());
       });
 
+      loginForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const selectedRole = loginUser.value;
+        if (loginPassword.value === passwords[selectedRole]) {
+          authError.textContent = "";
+          signIn(selectedRole);
+          return;
+        }
+        authError.textContent = "Password does not match that user.";
+      });
+
+      logoutButton.addEventListener("click", signOut);
       document.querySelector("#new-issue-side").addEventListener("click", newIssue);
       document.querySelector("#back-to-timeline").addEventListener("click", openTimeline);
       document.querySelector("#save-issue").addEventListener("click", () => saveActiveIssue(true));
@@ -994,11 +1149,13 @@
       });
 
       document.querySelector("#download-html").addEventListener("click", () => {
+        if (!isAdmin()) return;
         downloadIssue();
         setStatus("Newsletter HTML downloaded.");
       });
 
       document.querySelector("#delete-issue").addEventListener("click", () => {
+        if (!isAdmin()) return;
         if (!activeId || !confirm("Delete this issue from this browser?")) return;
         issues = issues.filter((issue) => issue.id !== activeId);
         activeId = null;
@@ -1008,6 +1165,7 @@
 
       document.querySelectorAll("[data-command]").forEach((button) => {
         button.addEventListener("click", () => {
+          if (!isAdmin()) return;
           fields.content.focus();
           document.execCommand(button.dataset.command, false, null);
           saveActiveIssue();
@@ -1016,6 +1174,7 @@
 
       document.querySelectorAll("[data-block]").forEach((button) => {
         button.addEventListener("click", () => {
+          if (!isAdmin()) return;
           fields.content.focus();
           document.execCommand("formatBlock", false, button.dataset.block);
           saveActiveIssue();
@@ -1033,6 +1192,7 @@
           openIssue(openButton.dataset.open);
         }
         if (exportButton) {
+          if (!isAdmin()) return;
           const issue = issues.find((item) => item.id === exportButton.dataset.export);
           if (issue) downloadIssue(issue);
         }
@@ -1040,7 +1200,15 @@
 
       loadTheme();
       loadIssues();
-      renderTimeline();
+      role = sessionStorage.getItem(authKey);
+      if (role === "guest" || role === "admin") {
+        syncRoleUi();
+        showOnly(timelineView);
+        renderTimeline();
+      } else {
+        syncRoleUi();
+        showOnly(loginView);
+      }
     </script>
   </body>
 </html>

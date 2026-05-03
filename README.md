@@ -15,6 +15,9 @@ GitHub will give you a public URL after the first deploy finishes.
 
 ## Use It
 
+- The page opens to a login screen.
+- Guest can view the timeline and newsletters.
+- Admin can add, edit, delete, download, and change theme colors.
 - The page opens to a timeline of saved newsletter issues.
 - Use **Add New** to open the writing space.
 - Write directly in the newsletter body.
@@ -25,3 +28,5 @@ GitHub will give you a public URL after the first deploy finishes.
 - Use **Download** to export a clean published version.
 
 GitHub Pages is static hosting, so browser autosave is local to the device you are using.
+
+The login is client-side because GitHub Pages is static hosting. It controls the page experience, but it is not strong security because the passwords are still present in the page source.
