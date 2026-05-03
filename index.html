@@ -82,19 +82,6 @@
         min-height: 100vh;
       }
 
-      .topbar {
-        align-items: center;
-        background: rgba(247, 241, 232, 0.94);
-        border-bottom: 1px solid var(--line);
-        display: flex;
-        gap: 16px;
-        justify-content: space-between;
-        padding: 16px clamp(16px, 4vw, 40px);
-        position: sticky;
-        top: 0;
-        z-index: 3;
-      }
-
       .identity h1 {
         font-size: 28px;
         font-weight: 400;
@@ -127,15 +114,18 @@
 
       .timeline-layout {
         display: grid;
-        gap: clamp(22px, 4vw, 46px);
-        grid-template-columns: minmax(220px, 300px) minmax(0, 760px);
-        margin: 0 auto;
-        max-width: 1120px;
-        padding: clamp(22px, 5vw, 56px);
+        gap: clamp(26px, 5vw, 58px);
+        min-height: 100vh;
+        padding: clamp(22px, 4vw, 52px);
+        width: 100%;
       }
 
       .timeline-intro {
-        padding-top: 8px;
+        align-items: end;
+        display: grid;
+        gap: 22px;
+        grid-template-columns: minmax(0, 1fr) auto;
+        max-width: none;
       }
 
       .eyebrow,
@@ -148,7 +138,7 @@
       }
 
       .timeline-intro h2 {
-        font-size: clamp(36px, 7vw, 64px);
+        font-size: clamp(42px, 9vw, 112px);
         font-weight: 400;
         line-height: 0.95;
         margin: 8px 0 14px;
@@ -156,16 +146,33 @@
 
       .timeline-intro p {
         color: #544c45;
-        font-size: 18px;
+        font-size: clamp(17px, 2vw, 22px);
         line-height: 1.55;
         margin: 0 0 22px;
+        max-width: 680px;
       }
 
       .timeline {
-        border-left: 2px solid var(--line);
-        display: grid;
-        gap: 18px;
-        padding-left: 28px;
+        align-items: stretch;
+        display: flex;
+        gap: 24px;
+        min-height: 420px;
+        overflow-x: auto;
+        padding: 54px clamp(12px, 2vw, 28px) 24px;
+        position: relative;
+        scroll-snap-type: x proximity;
+        width: 100%;
+      }
+
+      .timeline::before {
+        background: var(--line);
+        content: "";
+        height: 2px;
+        left: 0;
+        min-width: 100%;
+        position: absolute;
+        right: 0;
+        top: 24px;
       }
 
       .timeline-empty {
@@ -175,6 +182,7 @@
         color: var(--muted);
         font-family: Arial, sans-serif;
         line-height: 1.5;
+        min-width: min(560px, calc(100vw - 44px));
         padding: 28px;
       }
 
@@ -185,8 +193,11 @@
         box-shadow: 0 8px 22px rgba(36, 32, 29, 0.08);
         display: grid;
         gap: 12px;
+        grid-template-rows: auto auto 1fr auto auto;
+        min-width: clamp(280px, 30vw, 430px);
         padding: 20px;
         position: relative;
+        scroll-snap-align: start;
       }
 
       .issue-card::before {
@@ -195,9 +206,9 @@
         border-radius: 50%;
         content: "";
         height: 14px;
-        left: -37px;
+        left: 26px;
         position: absolute;
-        top: 24px;
+        top: -39px;
         width: 14px;
       }
 
@@ -240,11 +251,11 @@
       .tools {
         background: var(--panel);
         border-right: 1px solid var(--line);
-        height: calc(100vh - 73px);
+        height: 100vh;
         overflow: auto;
         padding: 24px;
         position: sticky;
-        top: 73px;
+        top: 0;
       }
 
       .tools h2 {
@@ -310,7 +321,7 @@
         box-shadow: var(--shadow);
         margin: 0 auto;
         max-width: 860px;
-        min-height: calc(100vh - 141px);
+        min-height: calc(100vh - 68px);
         padding: clamp(28px, 6vw, 64px);
       }
 
@@ -402,13 +413,16 @@
       }
 
       @media (max-width: 880px) {
-        .topbar {
-          align-items: stretch;
-          flex-direction: column;
+        .editor-layout {
+          grid-template-columns: 1fr;
         }
 
-        .timeline-layout,
-        .editor-layout {
+        .timeline-layout {
+          padding: 20px 16px 28px;
+        }
+
+        .timeline-intro {
+          align-items: start;
           grid-template-columns: 1fr;
         }
 
@@ -431,7 +445,6 @@
           background: #fff;
         }
 
-        .topbar,
         .tools {
           display: none;
         }
@@ -454,20 +467,18 @@
   </head>
   <body>
     <main class="shell">
-      <header class="topbar">
-        <div class="identity">
-          <h1>Alice's Notes</h1>
-          <p>Personal newsletters, journal entries, links, and small updates.</p>
-        </div>
-        <button type="button" id="new-issue-top">+ Add New</button>
-      </header>
-
       <section class="view active" id="timeline-view">
         <div class="timeline-layout">
           <aside class="timeline-intro">
-            <div class="eyebrow">Timeline</div>
-            <h2>Letters from lately</h2>
-            <p>A home for finished notes and works in progress. Open an entry to keep writing or start a new one.</p>
+            <div>
+              <div class="identity">
+                <h1>Alice's Notes</h1>
+                <p>Personal newsletters, journal entries, links, and small updates.</p>
+              </div>
+              <div class="eyebrow">Timeline</div>
+              <h2>Letters from lately</h2>
+              <p>A home for finished notes and works in progress. Open an entry to keep writing or start a new one.</p>
+            </div>
             <button type="button" id="new-issue-side">+ Add New</button>
           </aside>
           <div class="timeline" id="timeline"></div>
@@ -793,7 +804,6 @@
         field.addEventListener("input", () => saveActiveIssue());
       });
 
-      document.querySelector("#new-issue-top").addEventListener("click", newIssue);
       document.querySelector("#new-issue-side").addEventListener("click", newIssue);
       document.querySelector("#back-to-timeline").addEventListener("click", openTimeline);
       document.querySelector("#save-issue").addEventListener("click", () => saveActiveIssue(true));
