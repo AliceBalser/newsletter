@@ -1569,7 +1569,11 @@
 
       function saveEditorSelection() {
         const selection = window.getSelection();
-        if (selection.rangeCount && richAreas.some((area) => area.contains(selection.anchorNode))) {
+        if (
+          selection.rangeCount &&
+          !selection.getRangeAt(0).collapsed &&
+          richAreas.some((area) => area.contains(selection.anchorNode))
+        ) {
           savedRange = selection.getRangeAt(0).cloneRange();
         }
       }
@@ -1589,8 +1593,12 @@
         if (range.collapsed) return false;
         const span = document.createElement("span");
         Object.assign(span.style, style);
-        span.appendChild(range.extractContents());
-        range.insertNode(span);
+        try {
+          range.surroundContents(span);
+        } catch {
+          span.appendChild(range.extractContents());
+          range.insertNode(span);
+        }
         selection.removeAllRanges();
         const nextRange = document.createRange();
         nextRange.selectNodeContents(span);
@@ -1685,6 +1693,17 @@
         area.addEventListener("mouseup", saveEditorSelection);
         area.addEventListener("keyup", saveEditorSelection);
         area.addEventListener("focus", saveEditorSelection);
+      });
+      document.addEventListener("selectionchange", () => {
+        const active = document.activeElement;
+        if (active?.closest?.(".tools")) return;
+        saveEditorSelection();
+      });
+      ["#text-font", "#text-color"].forEach((selector) => {
+        const control = document.querySelector(selector);
+        control.addEventListener("pointerdown", () => saveEditorSelection());
+        control.addEventListener("mousedown", () => saveEditorSelection());
+        control.addEventListener("focus", () => restoreEditorSelection());
       });
 
       loginForm.addEventListener("submit", (event) => {
