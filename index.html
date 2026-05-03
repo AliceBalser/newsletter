@@ -12,6 +12,8 @@
         --faint: #9b9286;
         --line: #d8d0c4;
         --paper: #fffdf8;
+        --tile-page: #fffdf8;
+        --settings-page: #fffdf8;
         --wash: #eee7dd;
         --panel: #eee7dd;
         --input-bg: #fffdf8;
@@ -149,7 +151,7 @@
       }
 
       .login-panel {
-        background: var(--paper);
+        background: var(--settings-page);
         border-radius: 8px;
         box-shadow: var(--shadow);
         margin: 0 auto;
@@ -187,6 +189,7 @@
       .timeline-layout {
         display: grid;
         gap: clamp(26px, 5vw, 58px);
+        grid-template-rows: auto minmax(0, 1fr);
         min-height: 100vh;
         padding: clamp(22px, 4vw, 52px);
         width: 100%;
@@ -270,9 +273,10 @@
 
       .timeline {
         align-items: stretch;
+        align-self: end;
         display: flex;
         gap: 24px;
-        min-height: 420px;
+        min-height: min(52vh, 500px);
         overflow-x: auto;
         padding: 54px clamp(12px, 2vw, 28px) 24px;
         position: relative;
@@ -310,7 +314,7 @@
       }
 
       .timeline-empty {
-        background: var(--paper);
+        background: var(--tile-page);
         border-radius: 8px;
         color: var(--timeline-copy);
         font-family: Arial, sans-serif;
@@ -320,7 +324,7 @@
       }
 
       .issue-card {
-        background: var(--paper);
+        background: var(--tile-page);
         border-radius: 8px;
         box-shadow: 0 8px 22px rgba(36, 32, 29, 0.08);
         display: grid;
@@ -451,7 +455,7 @@
       }
 
       .settings-panel {
-        background: var(--paper);
+        background: var(--settings-page);
         border-radius: 8px;
         box-shadow: var(--shadow);
         padding: clamp(22px, 4vw, 36px);
@@ -819,6 +823,14 @@
                 <input id="theme-background" type="color" data-theme-color="--wash">
               </div>
               <div class="color-field">
+                <label for="theme-tile-page" class="eyebrow">Timeline Tiles</label>
+                <input id="theme-tile-page" type="color" data-theme-color="--tile-page">
+              </div>
+              <div class="color-field">
+                <label for="theme-settings-page" class="eyebrow">Settings Page</label>
+                <input id="theme-settings-page" type="color" data-theme-color="--settings-page">
+              </div>
+              <div class="color-field">
                 <label for="theme-accent" class="eyebrow">Button 1</label>
                 <input id="theme-accent" type="color" data-theme-color="--accent">
               </div>
@@ -865,6 +877,8 @@
         "--ink": "#24201d",
         "--wash": "#eee7dd",
         "--paper": "#fffdf8",
+        "--tile-page": "#fffdf8",
+        "--settings-page": "#fffdf8",
         "--panel": "#eee7dd",
         "--input-bg": "#fffdf8",
         "--secondary": "#fffaf0",
@@ -934,7 +948,7 @@
         document.querySelectorAll("[data-admin-only]").forEach((item) => {
           item.hidden = !isAdmin();
         });
-        settingsButton.hidden = !isAdmin();
+        settingsButton.hidden = !isAdmin() || !timelineView.classList.contains("active");
         logoutButton.hidden = role !== "guest";
         guestBackButton.hidden = role !== "guest" || !editorView.classList.contains("active");
         guestDownloadButton.hidden = role !== "guest" || !editorView.classList.contains("active");
@@ -998,6 +1012,8 @@
           ...theme,
           "--panel": theme["--wash"],
           "--paper": theme["--wash"],
+          "--tile-page": theme["--tile-page"] || defaultTheme["--tile-page"],
+          "--settings-page": theme["--settings-page"] || defaultTheme["--settings-page"],
           "--input-bg": theme["--secondary"],
           "--secondary-hover": theme["--secondary"],
           "--accent-dark": theme["--accent"],
@@ -1162,9 +1178,10 @@
 
       function openSettings() {
         if (!isAdmin()) return;
+        if (!timelineView.classList.contains("active")) return;
         if (settingsView.classList.contains("active")) return;
         saveActiveIssue();
-        lastView = editorView.classList.contains("active") ? "editor" : "timeline";
+        lastView = "timeline";
         timelineView.classList.remove("active");
         editorView.classList.remove("active");
         settingsView.classList.add("active");
@@ -1172,12 +1189,8 @@
 
       function closeSettings() {
         settingsView.classList.remove("active");
-        if (lastView === "editor" && activeId) {
-          editorView.classList.add("active");
-        } else {
-          timelineView.classList.add("active");
-          renderTimeline();
-        }
+        timelineView.classList.add("active");
+        renderTimeline();
       }
 
       function newIssue() {

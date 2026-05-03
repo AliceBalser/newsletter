@@ -17,7 +17,7 @@ GitHub will give you a public URL after the first deploy finishes.
 
 - The page opens to a login screen.
 - Guest can view and download newsletters.
-- Admin can add, edit, delete, download, change the app theme, and set newsletter-specific page/text colors.
+- Admin can add, edit, delete, download, change timeline/settings theme colors, and set newsletter-specific page/text colors.
 - The page opens to a timeline of saved newsletter issues.
 - Use **Add New** to open the writing space.
 - Write directly in the newsletter body.
