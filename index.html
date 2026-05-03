@@ -1445,7 +1445,7 @@
 
       function saveActiveIssue(showMessage = false) {
         if (!isAdmin() || !activeId) return;
-        updatePreview();
+        applyIssueStyle({ page: fields.issuePage.value });
         const next = readEditor();
         const index = issues.findIndex((issue) => issue.id === activeId);
         if (index >= 0) {
