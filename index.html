@@ -1005,6 +1005,7 @@
               <label class="secondary file-button" for="font-file">Import File</label>
               <input id="font-file" type="file" accept=".ttf,.otf,.woff,.woff2,font/*" hidden>
             </div>
+            <p class="status" id="font-file-status">No font file selected.</p>
             <div class="eyebrow">Custom Breaks</div>
             <div class="field">
               <label for="custom-break-text">Break Item</label>
@@ -1117,6 +1118,7 @@
       let lastView = "timeline";
       let role = null;
       let savedRange = null;
+      let pendingFontFile = null;
 
       function isAdmin() {
         return role === "admin";
@@ -1261,6 +1263,22 @@
         return `https://fonts.googleapis.com/css2?family=${encodeURIComponent(name).replace(/%20/g, "+")}:wght@400;700&display=swap`;
       }
 
+      function fontFormat(fileName = "") {
+        const extension = fileName.split(".").pop().toLowerCase();
+        if (extension === "ttf") return "truetype";
+        if (extension === "otf") return "opentype";
+        if (extension === "woff") return "woff";
+        if (extension === "woff2") return "woff2";
+        return "";
+      }
+
+      function fontFileNameToLabel(fileName = "") {
+        return fileName
+          .replace(/\.(ttf|otf|woff2?|TTF|OTF|WOFF2?)$/, "")
+          .replace(/[-_]+/g, " ")
+          .trim();
+      }
+
       function renderFonts() {
         document.querySelectorAll("[data-imported-font-link]").forEach((link) => link.remove());
         document.querySelector("#imported-font-faces")?.remove();
@@ -1268,7 +1286,10 @@
         fontFaceStyle.id = "imported-font-faces";
         fontFaceStyle.textContent = customFonts
           .filter((font) => font.dataUrl)
-          .map((font) => `@font-face { font-family: "${font.name.replace(/"/g, '\\"')}"; src: url("${font.dataUrl}"); font-display: swap; }`)
+          .map((font) => {
+            const format = font.format ? ` format("${font.format}")` : "";
+            return `@font-face { font-family: "${font.name.replace(/"/g, '\\"')}"; src: url("${font.dataUrl}")${format}; font-weight: 400 700; font-style: normal; font-display: swap; }`;
+          })
           .join("\n");
         document.head.appendChild(fontFaceStyle);
 
@@ -1298,7 +1319,7 @@
           localStorage.removeItem(fontKey);
         }
         const before = customFonts.length;
-        customFonts = customFonts.filter((font) => font.name?.toLowerCase() !== "marley antique");
+        customFonts = customFonts.filter((font) => !font.name?.toLowerCase().includes("marley antique"));
         if (customFonts.length !== before) saveFonts();
         renderFonts();
       }
@@ -1690,8 +1711,29 @@
       document.querySelector("#back-from-settings").addEventListener("click", closeSettings);
       document.querySelector("#import-font").addEventListener("click", () => {
         const nameInput = document.querySelector("#font-family-name");
-        const name = nameInput.value.trim();
+        const status = document.querySelector("#font-file-status");
+        const name = nameInput.value.trim() || fontFileNameToLabel(pendingFontFile?.name || "");
         if (!name) return;
+        if (pendingFontFile) {
+          const file = pendingFontFile;
+          const reader = new FileReader();
+          reader.addEventListener("load", () => {
+            customFonts = customFonts.filter((font) => font.name.toLowerCase() !== name.toLowerCase());
+            customFonts.push({
+              name,
+              dataUrl: reader.result,
+              fileName: file.name,
+              format: fontFormat(file.name)
+            });
+            saveFonts();
+            renderFonts();
+            pendingFontFile = null;
+            nameInput.value = "";
+            status.textContent = "Font file imported.";
+          });
+          reader.readAsDataURL(file);
+          return;
+        }
         if (!customFonts.some((font) => font.name.toLowerCase() === name.toLowerCase())) {
           customFonts.push({ name, url: googleFontUrl(name) });
         }
@@ -1703,17 +1745,12 @@
         const file = event.target.files[0];
         if (!file) return;
         const nameInput = document.querySelector("#font-family-name");
-        const nameFromFile = file.name.replace(/\.(ttf|otf|woff2?|TTF|OTF|WOFF2?)$/, "").replace(/[-_]+/g, " ");
-        const name = nameInput.value.trim() || nameFromFile;
-        const reader = new FileReader();
-        reader.addEventListener("load", () => {
-          customFonts = customFonts.filter((font) => font.name.toLowerCase() !== name.toLowerCase());
-          customFonts.push({ name, dataUrl: reader.result });
-          saveFonts();
-          renderFonts();
-          nameInput.value = "";
-        });
-        reader.readAsDataURL(file);
+        const status = document.querySelector("#font-file-status");
+        pendingFontFile = file;
+        if (!nameInput.value.trim()) {
+          nameInput.value = fontFileNameToLabel(file.name);
+        }
+        status.textContent = `Selected: ${file.name}`;
         event.target.value = "";
       });
       document.querySelector("#text-font").addEventListener("change", (event) => {
