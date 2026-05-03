@@ -820,10 +820,17 @@
                 <label for="theme-secondary" class="eyebrow">Button 2</label>
                 <input id="theme-secondary" type="color" data-theme-color="--secondary">
               </div>
+              <div class="color-field">
+                <label for="theme-timeline-line" class="eyebrow">Timeline Line</label>
+                <input id="theme-timeline-line" type="color" data-theme-color="--timeline-line">
+              </div>
+              <div class="color-field">
+                <label for="theme-timeline-marker" class="eyebrow">Timeline Marker</label>
+                <input id="theme-timeline-marker" type="color" data-theme-color="--rose">
+              </div>
             </div>
             <div class="button-grid">
               <button type="button" id="back-from-settings">Back</button>
-              <button type="button" id="reset-theme" class="secondary">Reset Theme</button>
               <button type="button" id="settings-logout" class="secondary">Log Out</button>
             </div>
           </div>
@@ -997,8 +1004,8 @@
           "--secondary-hover": theme["--secondary"],
           "--accent-dark": theme["--accent"],
           "--button-text": theme["--label"],
-          "--timeline-line": theme["--secondary"],
-          "--rose": theme["--secondary"],
+          "--timeline-line": theme["--timeline-line"] || defaultTheme["--timeline-line"],
+          "--rose": theme["--rose"] || defaultTheme["--rose"],
           "--newsletter-meta": theme["--ink"],
           "--intro": theme["--label"],
           "--section-accent": theme["--label"],
@@ -1279,11 +1286,6 @@
       document.querySelector("#save-issue").addEventListener("click", () => saveActiveIssue(true));
       document.querySelector("#open-settings").addEventListener("click", openSettings);
       document.querySelector("#back-from-settings").addEventListener("click", closeSettings);
-      document.querySelector("#reset-theme").addEventListener("click", () => {
-        localStorage.removeItem(themeKey);
-        applyTheme(defaultTheme);
-      });
-
       themeInputs.forEach((input) => {
         input.addEventListener("input", saveTheme);
       });
