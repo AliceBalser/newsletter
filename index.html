@@ -1016,10 +1016,6 @@
               <label for="font-family-name">Font Name</label>
               <input id="font-family-name" type="text" placeholder="Playfair Display">
             </div>
-            <div class="field">
-              <label for="font-css-url">CSS or Google Fonts URL</label>
-              <input id="font-css-url" type="url" placeholder="https://fonts.googleapis.com/css2?...">
-            </div>
             <div class="button-grid">
               <button type="button" class="secondary" id="import-font">Import Font</button>
             </div>
@@ -1257,14 +1253,19 @@
         localStorage.setItem(fontKey, JSON.stringify(customFonts));
       }
 
+      function googleFontUrl(name) {
+        return `https://fonts.googleapis.com/css2?family=${encodeURIComponent(name).replace(/%20/g, "+")}:wght@400;700&display=swap`;
+      }
+
       function renderFonts() {
-        document.querySelector("#imported-fonts")?.remove();
-        const style = document.createElement("style");
-        style.id = "imported-fonts";
-        style.textContent = customFonts
-          .map((font) => `@import url("${font.url.replace(/"/g, "%22")}");`)
-          .join("\n");
-        document.head.appendChild(style);
+        document.querySelectorAll("[data-imported-font-link]").forEach((link) => link.remove());
+        customFonts.forEach((font) => {
+          const link = document.createElement("link");
+          link.dataset.importedFontLink = "true";
+          link.rel = "stylesheet";
+          link.href = font.url || googleFontUrl(font.name);
+          document.head.appendChild(link);
+        });
 
         fontSelect.querySelectorAll("[data-custom-font]").forEach((option) => option.remove());
         customFonts.forEach((font) => {
@@ -1652,15 +1653,14 @@
       document.querySelector("#back-from-settings").addEventListener("click", closeSettings);
       document.querySelector("#import-font").addEventListener("click", () => {
         const nameInput = document.querySelector("#font-family-name");
-        const urlInput = document.querySelector("#font-css-url");
         const name = nameInput.value.trim();
-        const url = urlInput.value.trim();
-        if (!name || !url) return;
-        customFonts.push({ name, url });
+        if (!name) return;
+        if (!customFonts.some((font) => font.name.toLowerCase() === name.toLowerCase())) {
+          customFonts.push({ name, url: googleFontUrl(name) });
+        }
         saveFonts();
         renderFonts();
         nameInput.value = "";
-        urlInput.value = "";
       });
       document.querySelector("#text-font").addEventListener("change", (event) => {
         applyInlineStyle("fontName", event.target.value || "Georgia");
