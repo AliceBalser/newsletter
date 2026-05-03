@@ -16,7 +16,7 @@ GitHub will give you a public URL after the first deploy finishes.
 ## Use It
 
 - The page opens to a login screen.
-- Guest can view the timeline and newsletters.
+- Guest can view and download newsletters.
 - Admin can add, edit, delete, download, and change theme colors.
 - The page opens to a timeline of saved newsletter issues.
 - Use **Add New** to open the writing space.

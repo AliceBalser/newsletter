@@ -187,10 +187,25 @@
       }
 
       .logout-button {
-        bottom: clamp(16px, 3vw, 34px);
-        left: clamp(16px, 3vw, 34px);
-        position: fixed;
+        position: fixed !important;
+        right: clamp(16px, 3vw, 34px);
+        top: clamp(16px, 3vw, 34px);
         z-index: 4;
+      }
+
+      .guest-back-button,
+      .guest-download-button {
+        position: fixed !important;
+        top: clamp(16px, 3vw, 34px);
+        z-index: 4;
+      }
+
+      .guest-back-button {
+        left: clamp(16px, 3vw, 34px);
+      }
+
+      .guest-download-button {
+        left: clamp(150px, 16vw, 190px);
       }
 
       .gear-button:hover {
@@ -626,6 +641,8 @@
         </svg>
       </button>
       <button type="button" class="logout-button secondary" id="logout" hidden>Log Out</button>
+      <button type="button" class="guest-back-button secondary" id="guest-back-to-timeline" hidden>Back to Timeline</button>
+      <button type="button" class="guest-download-button secondary" id="guest-download" hidden>Download</button>
 
       <section class="view active" id="login-view">
         <div class="auth-page">
@@ -834,6 +851,7 @@
             <div class="button-grid">
               <button type="button" id="back-from-settings">Back</button>
               <button type="button" id="reset-theme" class="secondary">Reset Theme</button>
+              <button type="button" id="settings-logout" class="secondary">Log Out</button>
             </div>
           </div>
         </div>
@@ -859,6 +877,9 @@
       const loginUser = document.querySelector("#login-user");
       const loginPassword = document.querySelector("#login-password");
       const logoutButton = document.querySelector("#logout");
+      const settingsLogoutButton = document.querySelector("#settings-logout");
+      const guestBackButton = document.querySelector("#guest-back-to-timeline");
+      const guestDownloadButton = document.querySelector("#guest-download");
       const settingsButton = document.querySelector("#open-settings");
       const themeInputs = document.querySelectorAll("[data-theme-color]");
       const defaultTheme = {
@@ -924,6 +945,7 @@
         [loginView, timelineView, editorView, settingsView].forEach((item) => {
           item.classList.toggle("active", item === view);
         });
+        if (role) window.setTimeout(syncRoleUi, 0);
       }
 
       function syncRoleUi() {
@@ -931,7 +953,9 @@
           item.hidden = !isAdmin();
         });
         settingsButton.hidden = !isAdmin();
-        logoutButton.hidden = !role;
+        logoutButton.hidden = role !== "guest";
+        guestBackButton.hidden = role !== "guest" || !editorView.classList.contains("active");
+        guestDownloadButton.hidden = role !== "guest" || !editorView.classList.contains("active");
         fields.content.contentEditable = isAdmin() ? "true" : "false";
         document.querySelector(".tools").hidden = !isAdmin();
         document.querySelector(".editor-layout").classList.toggle("readonly", !isAdmin());
@@ -1086,10 +1110,7 @@
 
       function openTimeline() {
         saveActiveIssue();
-        settingsView.classList.remove("active");
-        editorView.classList.remove("active");
-        timelineView.classList.add("active");
-        loginView.classList.remove("active");
+        showOnly(timelineView);
         lastView = "timeline";
         renderTimeline();
       }
@@ -1175,7 +1196,7 @@
               <div class="tag-row">${tags}</div>
               <div class="card-actions">
                 <button type="button" data-open="${issue.id}">Open</button>
-                ${isAdmin() ? `<button type="button" class="secondary" data-export="${issue.id}">Download</button>` : ""}
+                <button type="button" class="secondary" data-export="${issue.id}">Download</button>
               </div>
             `;
             timeline.appendChild(card);
@@ -1207,7 +1228,7 @@
       }
 
       function downloadIssue(issue = readEditor()) {
-        if (!isAdmin() || !issue) return;
+        if (!issue) return;
         const slug = (issue.title || "newsletter")
           .toLowerCase()
           .replace(/[^a-z0-9]+/g, "-")
@@ -1236,6 +1257,11 @@
       });
 
       logoutButton.addEventListener("click", signOut);
+      settingsLogoutButton.addEventListener("click", signOut);
+      guestBackButton.addEventListener("click", openTimeline);
+      guestDownloadButton.addEventListener("click", () => {
+        downloadIssue();
+      });
       document.querySelector("#new-issue-side").addEventListener("click", newIssue);
       document.querySelector("#back-to-timeline").addEventListener("click", openTimeline);
       document.querySelector("#save-issue").addEventListener("click", () => saveActiveIssue(true));
@@ -1251,7 +1277,6 @@
       });
 
       document.querySelector("#download-html").addEventListener("click", () => {
-        if (!isAdmin()) return;
         downloadIssue();
         setStatus("Newsletter HTML downloaded.");
       });
@@ -1294,7 +1319,6 @@
           openIssue(openButton.dataset.open);
         }
         if (exportButton) {
-          if (!isAdmin()) return;
           const issue = issues.find((item) => item.id === exportButton.dataset.export);
           if (issue) downloadIssue(issue);
         }
