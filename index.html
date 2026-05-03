@@ -13,7 +13,7 @@
         --line: #d8d0c4;
         --paper: #fffdf8;
         --wash: #eee7dd;
-        --panel: #f7f1e8;
+        --panel: #eee7dd;
         --input-bg: #fffdf8;
         --secondary: #fffaf0;
         --secondary-hover: #f3ecdf;
@@ -48,11 +48,33 @@
         display: none !important;
       }
 
+      html,
+      body {
+        scrollbar-color: var(--secondary) transparent;
+        scrollbar-width: thin;
+      }
+
       body {
         margin: 0;
         background: var(--wash);
         color: var(--ink);
         font-family: Georgia, "Times New Roman", serif;
+      }
+
+      html::-webkit-scrollbar,
+      body::-webkit-scrollbar {
+        width: 10px;
+      }
+
+      html::-webkit-scrollbar-track,
+      body::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      html::-webkit-scrollbar-thumb,
+      body::-webkit-scrollbar-thumb {
+        background: var(--secondary);
+        border-radius: 999px;
       }
 
       button,
@@ -64,7 +86,7 @@
 
       button {
         align-items: center;
-        border: 1px solid transparent;
+        border: 0;
         border-radius: 6px;
         background: var(--accent);
         color: var(--button-text);
@@ -82,8 +104,7 @@
 
       button.secondary {
         background: var(--secondary);
-        border-color: var(--line);
-        color: var(--ink);
+        color: var(--label);
       }
 
       button.secondary:hover {
@@ -92,7 +113,6 @@
 
       button.danger {
         background: var(--danger-bg);
-        border-color: var(--danger-border);
         color: var(--danger-text);
       }
 
@@ -130,7 +150,6 @@
 
       .login-panel {
         background: var(--paper);
-        border: 1px solid var(--line);
         border-radius: 8px;
         box-shadow: var(--shadow);
         margin: 0 auto;
@@ -175,13 +194,13 @@
 
       .gear-button {
         background: transparent;
-        border-color: var(--line);
         color: var(--ink);
         min-height: 44px;
         padding: 0;
         position: fixed !important;
         right: clamp(16px, 3vw, 34px);
         top: clamp(16px, 3vw, 34px);
+        transform: translateZ(0);
         width: 44px;
         z-index: 4;
       }
@@ -261,6 +280,24 @@
         width: 100%;
       }
 
+      .timeline {
+        scrollbar-width: thin;
+        scrollbar-color: var(--secondary) transparent;
+      }
+
+      .timeline::-webkit-scrollbar {
+        height: 10px;
+      }
+
+      .timeline::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      .timeline::-webkit-scrollbar-thumb {
+        background: var(--secondary);
+        border-radius: 999px;
+      }
+
       .timeline::before {
         background: var(--timeline-line);
         content: "";
@@ -274,7 +311,6 @@
 
       .timeline-empty {
         background: var(--paper);
-        border: 1px dashed var(--line);
         border-radius: 8px;
         color: var(--timeline-copy);
         font-family: Arial, sans-serif;
@@ -285,7 +321,6 @@
 
       .issue-card {
         background: var(--paper);
-        border: 1px solid var(--line);
         border-radius: 8px;
         box-shadow: 0 8px 22px rgba(36, 32, 29, 0.08);
         display: grid;
@@ -299,7 +334,6 @@
 
       .issue-card::before {
         background: var(--rose);
-        border: 3px solid var(--wash);
         border-radius: 50%;
         content: "";
         height: 14px;
@@ -351,12 +385,10 @@
 
       .tools {
         background: var(--panel);
-        border-right: 1px solid var(--line);
-        height: 100vh;
-        overflow: auto;
+        height: auto;
+        overflow: visible;
         padding: 24px;
-        position: sticky;
-        top: 0;
+        position: static;
       }
 
       .tools h2 {
@@ -376,7 +408,7 @@
       .field textarea,
       .field select {
         background: var(--input-bg);
-        border: 1px solid var(--line);
+        border: 0;
         border-radius: 6px;
         color: var(--ink);
         padding: 10px 11px;
@@ -420,7 +452,6 @@
 
       .settings-panel {
         background: var(--paper);
-        border: 1px solid var(--line);
         border-radius: 8px;
         box-shadow: var(--shadow);
         padding: clamp(22px, 4vw, 36px);
@@ -449,7 +480,6 @@
 
       .color-field {
         background: var(--panel);
-        border: 1px solid var(--line);
         border-radius: 8px;
         display: grid;
         gap: 8px;
@@ -457,7 +487,7 @@
       }
 
       .color-field input {
-        border: 1px solid var(--line);
+        border: 0;
         border-radius: 6px;
         height: 42px;
         padding: 4px;
@@ -465,7 +495,6 @@
       }
 
       .status {
-        border-top: 1px solid var(--line);
         font-size: 13px;
         line-height: 1.45;
         padding-top: 14px;
@@ -476,7 +505,8 @@
       }
 
       .newsletter {
-        background: var(--paper);
+        background: var(--issue-page, var(--paper));
+        color: var(--issue-primary, var(--ink));
         box-shadow: var(--shadow);
         margin: 0 auto;
         max-width: 860px;
@@ -485,7 +515,6 @@
       }
 
       .masthead {
-        border-bottom: 3px double var(--ink);
         display: grid;
         gap: 8px;
         margin-bottom: 28px;
@@ -494,7 +523,7 @@
       }
 
       .masthead .meta {
-        color: var(--newsletter-meta);
+        color: var(--issue-primary, var(--newsletter-meta));
       }
 
       .masthead h2 {
@@ -505,7 +534,7 @@
       }
 
       .dek {
-        color: var(--intro);
+        color: var(--issue-secondary, var(--intro));
         font-size: clamp(19px, 3vw, 25px);
         line-height: 1.35;
         margin: 0 auto;
@@ -520,7 +549,6 @@
       }
 
       .content h2 {
-        border-top: 1px solid var(--line);
         font-size: 30px;
         font-weight: 400;
         line-height: 1.15;
@@ -542,12 +570,12 @@
       }
 
       .content blockquote {
-        border-left: 4px solid var(--rose);
+        background: color-mix(in srgb, var(--secondary) 34%, transparent);
         color: var(--quote-text);
         font-size: 21px;
         line-height: 1.45;
         margin: 26px 0;
-        padding-left: 18px;
+        padding: 16px 18px;
       }
 
       .content ul {
@@ -565,8 +593,7 @@
       }
 
       .footer-note {
-        border-top: 1px solid var(--line);
-        color: var(--label);
+        color: var(--issue-secondary, var(--label));
         font-family: Arial, sans-serif;
         font-size: 13px;
         line-height: 1.45;
@@ -712,6 +739,22 @@
               <textarea id="newsletter-dek"></textarea>
             </div>
 
+            <div class="eyebrow">Newsletter Colors</div>
+            <div class="button-grid">
+              <div class="field">
+                <label for="issue-primary">Text</label>
+                <input id="issue-primary" type="color">
+              </div>
+              <div class="field">
+                <label for="issue-secondary">Details</label>
+                <input id="issue-secondary" type="color">
+              </div>
+              <div class="field">
+                <label for="issue-page">Page</label>
+                <input id="issue-page" type="color">
+              </div>
+            </div>
+
             <div class="eyebrow">Components</div>
             <div class="button-grid">
               <button type="button" class="secondary" data-insert="journal">Journal</button>
@@ -764,11 +807,11 @@
             <p>Change the colors used across the timeline and newsletter editor.</p>
             <div class="color-grid">
               <div class="color-field">
-                <label for="theme-ink" class="eyebrow">Text</label>
+                <label for="theme-ink" class="eyebrow">Primary Text</label>
                 <input id="theme-ink" type="color" data-theme-color="--ink">
               </div>
               <div class="color-field">
-                <label for="theme-label" class="eyebrow">Labels</label>
+                <label for="theme-label" class="eyebrow">Secondary Text</label>
                 <input id="theme-label" type="color" data-theme-color="--label">
               </div>
               <div class="color-field">
@@ -776,76 +819,12 @@
                 <input id="theme-background" type="color" data-theme-color="--wash">
               </div>
               <div class="color-field">
-                <label for="theme-paper" class="eyebrow">Paper</label>
-                <input id="theme-paper" type="color" data-theme-color="--paper">
-              </div>
-              <div class="color-field">
-                <label for="theme-panel" class="eyebrow">Panel</label>
-                <input id="theme-panel" type="color" data-theme-color="--panel">
-              </div>
-              <div class="color-field">
-                <label for="theme-input" class="eyebrow">Inputs</label>
-                <input id="theme-input" type="color" data-theme-color="--input-bg">
-              </div>
-              <div class="color-field">
-                <label for="theme-line" class="eyebrow">Borders</label>
-                <input id="theme-line" type="color" data-theme-color="--line">
-              </div>
-              <div class="color-field">
-                <label for="theme-accent" class="eyebrow">Accent</label>
+                <label for="theme-accent" class="eyebrow">Button 1</label>
                 <input id="theme-accent" type="color" data-theme-color="--accent">
               </div>
               <div class="color-field">
-                <label for="theme-button-text" class="eyebrow">Button Text</label>
-                <input id="theme-button-text" type="color" data-theme-color="--button-text">
-              </div>
-              <div class="color-field">
-                <label for="theme-secondary" class="eyebrow">Beige Buttons</label>
+                <label for="theme-secondary" class="eyebrow">Button 2</label>
                 <input id="theme-secondary" type="color" data-theme-color="--secondary">
-              </div>
-              <div class="color-field">
-                <label for="theme-rose" class="eyebrow">Timeline Dot</label>
-                <input id="theme-rose" type="color" data-theme-color="--rose">
-              </div>
-              <div class="color-field">
-                <label for="theme-timeline" class="eyebrow">Timeline Line</label>
-                <input id="theme-timeline" type="color" data-theme-color="--timeline-line">
-              </div>
-              <div class="color-field">
-                <label for="theme-tag-bg" class="eyebrow">Tags</label>
-                <input id="theme-tag-bg" type="color" data-theme-color="--tag-bg">
-              </div>
-              <div class="color-field">
-                <label for="theme-tag-text" class="eyebrow">Tag Text</label>
-                <input id="theme-tag-text" type="color" data-theme-color="--tag-text">
-              </div>
-              <div class="color-field">
-                <label for="theme-newsletter-meta" class="eyebrow">Kicker + Date</label>
-                <input id="theme-newsletter-meta" type="color" data-theme-color="--newsletter-meta">
-              </div>
-              <div class="color-field">
-                <label for="theme-intro" class="eyebrow">Intro</label>
-                <input id="theme-intro" type="color" data-theme-color="--intro">
-              </div>
-              <div class="color-field">
-                <label for="theme-section" class="eyebrow">Section Accent</label>
-                <input id="theme-section" type="color" data-theme-color="--section-accent">
-              </div>
-              <div class="color-field">
-                <label for="theme-timeline-copy" class="eyebrow">Timeline Text</label>
-                <input id="theme-timeline-copy" type="color" data-theme-color="--timeline-copy">
-              </div>
-              <div class="color-field">
-                <label for="theme-card-copy" class="eyebrow">Card Text</label>
-                <input id="theme-card-copy" type="color" data-theme-color="--card-copy">
-              </div>
-              <div class="color-field">
-                <label for="theme-quote" class="eyebrow">Quote Text</label>
-                <input id="theme-quote" type="color" data-theme-color="--quote-text">
-              </div>
-              <div class="color-field">
-                <label for="theme-danger" class="eyebrow">Delete Text</label>
-                <input id="theme-danger" type="color" data-theme-color="--danger-text">
               </div>
             </div>
             <div class="button-grid">
@@ -886,7 +865,7 @@
         "--ink": "#24201d",
         "--wash": "#eee7dd",
         "--paper": "#fffdf8",
-        "--panel": "#f7f1e8",
+        "--panel": "#eee7dd",
         "--input-bg": "#fffdf8",
         "--secondary": "#fffaf0",
         "--secondary-hover": "#f3ecdf",
@@ -916,7 +895,10 @@
         date: document.querySelector("#newsletter-date"),
         tags: document.querySelector("#newsletter-tags"),
         dek: document.querySelector("#newsletter-dek"),
-        content: document.querySelector("#newsletter-content")
+        content: document.querySelector("#newsletter-content"),
+        issuePrimary: document.querySelector("#issue-primary"),
+        issueSecondary: document.querySelector("#issue-secondary"),
+        issuePage: document.querySelector("#issue-page")
       };
       const preview = {
         title: document.querySelector("#preview-title"),
@@ -1012,11 +994,31 @@
       }
 
       function applyTheme(theme) {
-        Object.entries(theme).forEach(([name, value]) => {
+        const mapped = {
+          ...theme,
+          "--panel": theme["--wash"],
+          "--paper": theme["--wash"],
+          "--input-bg": theme["--secondary"],
+          "--secondary-hover": theme["--secondary"],
+          "--accent-dark": theme["--accent"],
+          "--button-text": theme["--label"],
+          "--timeline-line": theme["--secondary"],
+          "--rose": theme["--secondary"],
+          "--tag-bg": theme["--secondary"],
+          "--tag-text": theme["--label"],
+          "--newsletter-meta": theme["--ink"],
+          "--intro": theme["--label"],
+          "--section-accent": theme["--label"],
+          "--timeline-copy": theme["--label"],
+          "--card-copy": theme["--label"],
+          "--quote-text": theme["--label"],
+          "--line": "transparent"
+        };
+        Object.entries(mapped).forEach(([name, value]) => {
           document.documentElement.style.setProperty(name, value);
         });
         themeInputs.forEach((input) => {
-          input.value = theme[input.dataset.themeColor] || defaultTheme[input.dataset.themeColor];
+          input.value = mapped[input.dataset.themeColor] || defaultTheme[input.dataset.themeColor];
         });
       }
 
@@ -1035,8 +1037,6 @@
         themeInputs.forEach((input) => {
           theme[input.dataset.themeColor] = input.value;
         });
-        theme["--accent-dark"] = theme["--accent"];
-        theme["--secondary-hover"] = theme["--secondary"];
         localStorage.setItem(themeKey, JSON.stringify(theme));
         applyTheme(theme);
       }
@@ -1062,6 +1062,7 @@
             tags: "journal, links",
             dek: "A beginning place for thoughts, recommendations, and small life updates.",
             content: "<p>Write the opening note here. This can be as short as a personal update or as polished as a full letter.</p><h2>Journal</h2><p>What has been happening lately?</p><h2>Things Worth Sharing</h2><ul><li>A link, book, song, recipe, place, or idea.</li><li>A tiny observation from the week.</li></ul><blockquote>A line you want to remember.</blockquote><p>End with a sign-off, a question, or a preview of what is next.</p>",
+            ...issueStyle(),
             updatedAt: new Date().toISOString()
           }];
           saveIssues();
@@ -1077,6 +1078,26 @@
         preview.kicker.textContent = fields.kicker.value || "Personal Newsletter";
         preview.date.textContent = fields.date.value || todayLabel();
         preview.dek.textContent = fields.dek.value || "";
+        applyIssueStyle({
+          primary: fields.issuePrimary.value,
+          secondary: fields.issueSecondary.value,
+          page: fields.issuePage.value
+        });
+      }
+
+      function issueStyle(issue = {}) {
+        return {
+          primary: issue.primary || defaultTheme["--ink"],
+          secondary: issue.secondary || defaultTheme["--label"],
+          page: issue.page || defaultTheme["--paper"]
+        };
+      }
+
+      function applyIssueStyle(style) {
+        const newsletter = document.querySelector("#newsletter");
+        newsletter.style.setProperty("--issue-primary", style.primary || defaultTheme["--ink"]);
+        newsletter.style.setProperty("--issue-secondary", style.secondary || defaultTheme["--label"]);
+        newsletter.style.setProperty("--issue-page", style.page || defaultTheme["--paper"]);
       }
 
       function readEditor() {
@@ -1089,6 +1110,9 @@
           tags: fields.tags.value.trim(),
           dek: fields.dek.value.trim(),
           content: fields.content.innerHTML,
+          primary: fields.issuePrimary.value,
+          secondary: fields.issueSecondary.value,
+          page: fields.issuePage.value,
           updatedAt: new Date().toISOString()
         };
       }
@@ -1125,6 +1149,10 @@
         fields.tags.value = issue.tags || "";
         fields.dek.value = issue.dek || "";
         fields.content.innerHTML = issue.content || "";
+        const style = issueStyle(issue);
+        fields.issuePrimary.value = style.primary;
+        fields.issueSecondary.value = style.secondary;
+        fields.issuePage.value = style.page;
         updatePreview();
         showOnly(editorView);
         lastView = "editor";
@@ -1162,6 +1190,7 @@
           tags: "journal",
           dek: "",
           content: "<h2>Journal</h2><p>Today I want to remember...</p>",
+          ...issueStyle(),
           updatedAt: new Date().toISOString()
         };
         issues.unshift(issue);
@@ -1221,6 +1250,10 @@
         exported.querySelector("#preview-date").textContent = issue.date;
         exported.querySelector("#preview-dek").textContent = issue.dek;
         exported.querySelector("#newsletter-content").innerHTML = issue.content;
+        const style = issueStyle(issue);
+        exported.style.setProperty("--issue-primary", style.primary);
+        exported.style.setProperty("--issue-secondary", style.secondary);
+        exported.style.setProperty("--issue-page", style.page);
         exported.querySelector("#newsletter-content").removeAttribute("contenteditable");
         source.querySelector("script")?.remove();
         source.querySelector("title").textContent = issue.title;

@@ -17,14 +17,14 @@ GitHub will give you a public URL after the first deploy finishes.
 
 - The page opens to a login screen.
 - Guest can view and download newsletters.
-- Admin can add, edit, delete, download, and change theme colors.
+- Admin can add, edit, delete, download, change the app theme, and set newsletter-specific page/text colors.
 - The page opens to a timeline of saved newsletter issues.
 - Use **Add New** to open the writing space.
 - Write directly in the newsletter body.
 - Use the component buttons for journal sections, links, lists, photo notes, quotes, and sign-offs.
 - Edit the title, kicker, date, tags, and intro in the left panel.
 - Drafts and timeline entries save automatically in the current browser.
-- Use the gear button to change theme colors.
+- Use the gear button to change the app theme colors.
 - Use **Download** to export a clean published version.
 
 GitHub Pages is static hosting, so browser autosave is local to the device you are using.
