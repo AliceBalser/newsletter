@@ -22,7 +22,7 @@ GitHub will give you a public URL after the first deploy finishes.
 - Use **Add New** to open the writing space.
 - Write directly in the newsletter body.
 - Use the component buttons for journal sections, links, lists, photo notes, quotes, and sign-offs.
-- Edit the title, kicker, date, tags, and intro in the left panel.
+- Edit the title, kicker, date, and intro in the left panel.
 - Drafts and timeline entries save automatically in the current browser.
 - Use the gear button to change the app theme colors.
 - Use **Download** to export a clean published version.

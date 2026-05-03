@@ -24,8 +24,6 @@
         --accent-dark: #214f52;
         --rose: #b85d55;
         --timeline-line: #d8d0c4;
-        --tag-bg: #efe2cf;
-        --tag-text: #5b4b37;
         --newsletter-meta: #70685f;
         --intro: #70685f;
         --label: #70685f;
@@ -361,21 +359,10 @@
         margin: 0;
       }
 
-      .tag-row,
       .card-actions {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
-      }
-
-      .tag {
-        background: var(--tag-bg);
-        border-radius: 999px;
-        color: var(--tag-text);
-        font-family: Arial, sans-serif;
-        font-size: 12px;
-        font-weight: 700;
-        padding: 5px 9px;
       }
 
       .editor-layout {
@@ -734,11 +721,6 @@
             </div>
 
             <div class="field">
-              <label for="newsletter-tags">Tags</label>
-              <input id="newsletter-tags" type="text" placeholder="journal, links, spring">
-            </div>
-
-            <div class="field">
               <label for="newsletter-dek">Intro</label>
               <textarea id="newsletter-dek"></textarea>
             </div>
@@ -889,8 +871,6 @@
         "--accent-dark": "#214f52",
         "--rose": "#b85d55",
         "--timeline-line": "#d8d0c4",
-        "--tag-bg": "#efe2cf",
-        "--tag-text": "#5b4b37",
         "--newsletter-meta": "#70685f",
         "--intro": "#70685f",
         "--label": "#70685f",
@@ -907,7 +887,6 @@
         title: document.querySelector("#newsletter-title"),
         kicker: document.querySelector("#newsletter-kicker"),
         date: document.querySelector("#newsletter-date"),
-        tags: document.querySelector("#newsletter-tags"),
         dek: document.querySelector("#newsletter-dek"),
         content: document.querySelector("#newsletter-content"),
         issuePrimary: document.querySelector("#issue-primary"),
@@ -1020,8 +999,6 @@
           "--button-text": theme["--label"],
           "--timeline-line": theme["--secondary"],
           "--rose": theme["--secondary"],
-          "--tag-bg": theme["--secondary"],
-          "--tag-text": theme["--label"],
           "--newsletter-meta": theme["--ink"],
           "--intro": theme["--label"],
           "--section-accent": theme["--label"],
@@ -1075,7 +1052,6 @@
             title: "First note",
             kicker: "Personal Newsletter",
             date: todayLabel(),
-            tags: "journal, links",
             dek: "A beginning place for thoughts, recommendations, and small life updates.",
             content: "<p>Write the opening note here. This can be as short as a personal update or as polished as a full letter.</p><h2>Journal</h2><p>What has been happening lately?</p><h2>Things Worth Sharing</h2><ul><li>A link, book, song, recipe, place, or idea.</li><li>A tiny observation from the week.</li></ul><blockquote>A line you want to remember.</blockquote><p>End with a sign-off, a question, or a preview of what is next.</p>",
             ...issueStyle(),
@@ -1123,7 +1099,6 @@
           title: fields.title.value.trim() || "Untitled",
           kicker: fields.kicker.value.trim() || "Personal Newsletter",
           date: fields.date.value.trim() || todayLabel(),
-          tags: fields.tags.value.trim(),
           dek: fields.dek.value.trim(),
           content: fields.content.innerHTML,
           primary: fields.issuePrimary.value,
@@ -1162,7 +1137,6 @@
         fields.title.value = issue.title || "";
         fields.kicker.value = issue.kicker || "";
         fields.date.value = issue.date || "";
-        fields.tags.value = issue.tags || "";
         fields.dek.value = issue.dek || "";
         fields.content.innerHTML = issue.content || "";
         const style = issueStyle(issue);
@@ -1200,7 +1174,6 @@
           title: "Untitled note",
           kicker: "Personal Newsletter",
           date: todayLabel(),
-          tags: "journal",
           dek: "",
           content: "<h2>Journal</h2><p>Today I want to remember...</p>",
           ...issueStyle(),
@@ -1224,18 +1197,11 @@
           .forEach((issue) => {
             const card = document.createElement("article");
             card.className = "issue-card";
-            const tags = (issue.tags || "")
-              .split(",")
-              .map((tag) => tag.trim())
-              .filter(Boolean)
-              .map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`)
-              .join("");
             const excerpt = issue.dek || stripHtml(issue.content).slice(0, 160);
             card.innerHTML = `
               <div class="meta">${escapeHtml(issue.date || "Undated")}</div>
               <h3>${escapeHtml(issue.title || "Untitled")}</h3>
               <p>${escapeHtml(excerpt || "No preview yet.")}</p>
-              <div class="tag-row">${tags}</div>
               <div class="card-actions">
                 <button type="button" data-open="${issue.id}">Open</button>
                 <button type="button" class="secondary" data-export="${issue.id}">Download</button>
