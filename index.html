@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Alice's Notes</title>
+    <title>Letters from lately</title>
     <style>
       :root {
         color-scheme: light;
@@ -82,14 +82,6 @@
         min-height: 100vh;
       }
 
-      .identity h1 {
-        font-size: 28px;
-        font-weight: 400;
-        line-height: 1;
-        margin: 0 0 4px;
-      }
-
-      .identity p,
       .small-text,
       .status,
       .field label,
@@ -97,11 +89,6 @@
       .meta {
         color: var(--muted);
         font-family: Arial, sans-serif;
-      }
-
-      .identity p {
-        font-size: 14px;
-        margin: 0;
       }
 
       .view {
@@ -118,6 +105,28 @@
         min-height: 100vh;
         padding: clamp(22px, 4vw, 52px);
         width: 100%;
+      }
+
+      .gear-button {
+        background: transparent;
+        border-color: var(--line);
+        color: var(--ink);
+        min-height: 44px;
+        padding: 0;
+        position: fixed;
+        right: clamp(16px, 3vw, 34px);
+        top: clamp(16px, 3vw, 34px);
+        width: 44px;
+        z-index: 4;
+      }
+
+      .gear-button:hover {
+        background: var(--paper);
+      }
+
+      .gear-button svg {
+        height: 22px;
+        width: 22px;
       }
 
       .timeline-intro {
@@ -141,7 +150,7 @@
         font-size: clamp(42px, 9vw, 112px);
         font-weight: 400;
         line-height: 0.95;
-        margin: 8px 0 14px;
+        margin: 0 0 14px;
       }
 
       .timeline-intro p {
@@ -305,6 +314,63 @@
         margin-bottom: 16px;
       }
 
+      .single-row {
+        grid-template-columns: 1fr;
+      }
+
+      .settings-page {
+        margin: 0 auto;
+        max-width: 760px;
+        min-height: 100vh;
+        padding: clamp(24px, 5vw, 58px);
+      }
+
+      .settings-panel {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+        padding: clamp(22px, 4vw, 36px);
+      }
+
+      .settings-panel h2 {
+        font-size: clamp(40px, 7vw, 70px);
+        font-weight: 400;
+        line-height: 0.95;
+        margin: 0 0 14px;
+      }
+
+      .settings-panel p {
+        color: var(--muted);
+        font-size: 18px;
+        line-height: 1.45;
+        margin: 0 0 26px;
+      }
+
+      .color-grid {
+        display: grid;
+        gap: 14px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        margin-bottom: 22px;
+      }
+
+      .color-field {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        display: grid;
+        gap: 8px;
+        padding: 14px;
+      }
+
+      .color-field input {
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        height: 42px;
+        padding: 4px;
+        width: 100%;
+      }
+
       .status {
         border-top: 1px solid var(--line);
         font-size: 13px;
@@ -426,6 +492,10 @@
           grid-template-columns: 1fr;
         }
 
+        .color-grid {
+          grid-template-columns: 1fr;
+        }
+
         .tools {
           height: auto;
           position: static;
@@ -467,15 +537,17 @@
   </head>
   <body>
     <main class="shell">
+      <button type="button" class="gear-button" id="open-settings" aria-label="Open settings">
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"></path>
+          <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.7 1.7 0 0 0 15 19.37a1.7 1.7 0 0 0-1 .23 1.7 1.7 0 0 0-.85 1.47V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 8.3 19.44a1.7 1.7 0 0 0-1-.23 1.7 1.7 0 0 0-1.88.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 2.63 15a1.7 1.7 0 0 0-.23-1A1.7 1.7 0 0 0 .93 13.15H.84a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 2.4 8.3a1.7 1.7 0 0 0 .23-1 1.7 1.7 0 0 0-.34-1.88l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 7 2.63a1.7 1.7 0 0 0 1-.23A1.7 1.7 0 0 0 8.85.93V.84a2 2 0 1 1 4 0v.09A1.7 1.7 0 0 0 13.7 2.4a1.7 1.7 0 0 0 1 .23 1.7 1.7 0 0 0 1.88-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.37 7c.13.32.21.66.23 1a1.7 1.7 0 0 0 1.47.85h.09a2 2 0 1 1 0 4h-.09A1.7 1.7 0 0 0 19.6 13.7c-.02.34-.1.68-.2 1.3Z"></path>
+        </svg>
+      </button>
+
       <section class="view active" id="timeline-view">
         <div class="timeline-layout">
           <aside class="timeline-intro">
             <div>
-              <div class="identity">
-                <h1>Alice's Notes</h1>
-                <p>Personal newsletters, journal entries, links, and small updates.</p>
-              </div>
-              <div class="eyebrow">Timeline</div>
               <h2>Letters from lately</h2>
               <p>A home for finished notes and works in progress. Open an entry to keep writing or start a new one.</p>
             </div>
@@ -536,8 +608,6 @@
 
             <div class="button-grid">
               <button type="button" id="save-issue">Save</button>
-              <button type="button" id="print-newsletter" class="secondary">Print</button>
-              <button type="button" id="copy-html" class="secondary">Copy HTML</button>
               <button type="button" id="download-html" class="secondary">Download</button>
             </div>
 
@@ -561,14 +631,66 @@
           </section>
         </div>
       </section>
+
+      <section class="view" id="settings-view">
+        <div class="settings-page">
+          <div class="settings-panel">
+            <div class="eyebrow">Settings</div>
+            <h2>Theme colors</h2>
+            <p>Change the colors used across the timeline and newsletter editor.</p>
+            <div class="color-grid">
+              <div class="color-field">
+                <label for="theme-ink" class="eyebrow">Text</label>
+                <input id="theme-ink" type="color" data-theme-color="--ink">
+              </div>
+              <div class="color-field">
+                <label for="theme-background" class="eyebrow">Background</label>
+                <input id="theme-background" type="color" data-theme-color="--wash">
+              </div>
+              <div class="color-field">
+                <label for="theme-paper" class="eyebrow">Paper</label>
+                <input id="theme-paper" type="color" data-theme-color="--paper">
+              </div>
+              <div class="color-field">
+                <label for="theme-panel" class="eyebrow">Panel</label>
+                <input id="theme-panel" type="color" data-theme-color="--panel">
+              </div>
+              <div class="color-field">
+                <label for="theme-accent" class="eyebrow">Accent</label>
+                <input id="theme-accent" type="color" data-theme-color="--accent">
+              </div>
+              <div class="color-field">
+                <label for="theme-rose" class="eyebrow">Timeline Dot</label>
+                <input id="theme-rose" type="color" data-theme-color="--rose">
+              </div>
+            </div>
+            <div class="button-grid">
+              <button type="button" id="back-from-settings">Back</button>
+              <button type="button" id="reset-theme" class="secondary">Reset Theme</button>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
 
     <script>
       const storageKey = "newsletter-studio-issues-v2";
+      const themeKey = "newsletter-studio-theme-v1";
       const timelineView = document.querySelector("#timeline-view");
       const editorView = document.querySelector("#editor-view");
+      const settingsView = document.querySelector("#settings-view");
       const timeline = document.querySelector("#timeline");
       const status = document.querySelector("#status");
+      const themeInputs = document.querySelectorAll("[data-theme-color]");
+      const defaultTheme = {
+        "--ink": "#24201d",
+        "--wash": "#eee7dd",
+        "--paper": "#fffdf8",
+        "--panel": "#f7f1e8",
+        "--accent": "#2f6f73",
+        "--accent-dark": "#214f52",
+        "--rose": "#b85d55"
+      };
       const fields = {
         title: document.querySelector("#newsletter-title"),
         kicker: document.querySelector("#newsletter-kicker"),
@@ -593,6 +715,7 @@
       };
       let issues = [];
       let activeId = null;
+      let lastView = "timeline";
 
       function todayLabel() {
         return new Date().toLocaleDateString(undefined, {
@@ -624,6 +747,35 @@
         setStatus.timer = window.setTimeout(() => {
           status.textContent = "Draft saves automatically in this browser.";
         }, 2800);
+      }
+
+      function applyTheme(theme) {
+        Object.entries(theme).forEach(([name, value]) => {
+          document.documentElement.style.setProperty(name, value);
+        });
+        themeInputs.forEach((input) => {
+          input.value = theme[input.dataset.themeColor] || defaultTheme[input.dataset.themeColor];
+        });
+      }
+
+      function loadTheme() {
+        let saved = {};
+        try {
+          saved = JSON.parse(localStorage.getItem(themeKey)) || {};
+        } catch {
+          localStorage.removeItem(themeKey);
+        }
+        applyTheme({ ...defaultTheme, ...saved });
+      }
+
+      function saveTheme() {
+        const theme = {};
+        themeInputs.forEach((input) => {
+          theme[input.dataset.themeColor] = input.value;
+        });
+        theme["--accent-dark"] = theme["--accent"];
+        localStorage.setItem(themeKey, JSON.stringify(theme));
+        applyTheme(theme);
       }
 
       function saveIssues() {
@@ -694,8 +846,10 @@
 
       function openTimeline() {
         saveActiveIssue();
+        settingsView.classList.remove("active");
         editorView.classList.remove("active");
         timelineView.classList.add("active");
+        lastView = "timeline";
         renderTimeline();
       }
 
@@ -711,8 +865,29 @@
         fields.content.innerHTML = issue.content || "";
         updatePreview();
         timelineView.classList.remove("active");
+        settingsView.classList.remove("active");
         editorView.classList.add("active");
+        lastView = "editor";
         fields.content.focus();
+      }
+
+      function openSettings() {
+        if (settingsView.classList.contains("active")) return;
+        saveActiveIssue();
+        lastView = editorView.classList.contains("active") ? "editor" : "timeline";
+        timelineView.classList.remove("active");
+        editorView.classList.remove("active");
+        settingsView.classList.add("active");
+      }
+
+      function closeSettings() {
+        settingsView.classList.remove("active");
+        if (lastView === "editor" && activeId) {
+          editorView.classList.add("active");
+        } else {
+          timelineView.classList.add("active");
+          renderTimeline();
+        }
       }
 
       function newIssue() {
@@ -807,11 +982,15 @@
       document.querySelector("#new-issue-side").addEventListener("click", newIssue);
       document.querySelector("#back-to-timeline").addEventListener("click", openTimeline);
       document.querySelector("#save-issue").addEventListener("click", () => saveActiveIssue(true));
-      document.querySelector("#print-newsletter").addEventListener("click", () => window.print());
+      document.querySelector("#open-settings").addEventListener("click", openSettings);
+      document.querySelector("#back-from-settings").addEventListener("click", closeSettings);
+      document.querySelector("#reset-theme").addEventListener("click", () => {
+        localStorage.removeItem(themeKey);
+        applyTheme(defaultTheme);
+      });
 
-      document.querySelector("#copy-html").addEventListener("click", async () => {
-        await navigator.clipboard.writeText(buildExportHtml());
-        setStatus("Export HTML copied.");
+      themeInputs.forEach((input) => {
+        input.addEventListener("input", saveTheme);
       });
 
       document.querySelector("#download-html").addEventListener("click", () => {
@@ -859,6 +1038,7 @@
         }
       });
 
+      loadTheme();
       loadIssues();
       renderTimeline();
     </script>

@@ -21,7 +21,7 @@ GitHub will give you a public URL after the first deploy finishes.
 - Use the component buttons for journal sections, links, lists, photo notes, quotes, and sign-offs.
 - Edit the title, kicker, date, tags, and intro in the left panel.
 - Drafts and timeline entries save automatically in the current browser.
-- Use **Print** to print or save as PDF.
-- Use **Copy HTML** or **Download** to export a clean published version.
+- Use the gear button to change theme colors.
+- Use **Download** to export a clean published version.
 
 GitHub Pages is static hosting, so browser autosave is local to the device you are using.
