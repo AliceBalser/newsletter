@@ -3,8 +3,15 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Letters from lately</title>
+    <title>Alice: Through The Looking Glass</title>
     <style>
+      @font-face {
+        font-family: "AliceHeader";
+        src: url("./fonts/CHICK___.ttf") format("truetype");
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
+      }
       :root {
         color-scheme: light;
         --ink: #24201d;
@@ -171,6 +178,7 @@
       }
 
       .login-panel h1 {
+        font-family: "AliceHeader", Georgia, serif;
         font-size: clamp(42px, 8vw, 68px);
         font-weight: 400;
         line-height: 0.95;
@@ -267,6 +275,7 @@
       }
 
       .timeline-intro h2 {
+        font-family: "AliceHeader", Georgia, serif;
         font-size: clamp(42px, 9vw, 112px);
         font-weight: 400;
         line-height: 0.95;
@@ -551,6 +560,7 @@
       }
 
       .masthead {
+        font-family: "AliceHeader", Georgia, serif;
         display: grid;
         gap: 8px;
         margin-bottom: 28px;
@@ -818,7 +828,7 @@
       <section class="view active" id="login-view">
         <div class="auth-page">
           <form class="login-panel" id="login-form">
-            <h1>Letters from lately</h1>
+            <h1>Alice: Through The Looking Glass</h1>
             <p>Sign in to read the timeline or manage newsletter entries.</p>
             <div class="field">
               <label for="login-user">User</label>
@@ -843,7 +853,7 @@
         <div class="timeline-layout">
           <aside class="timeline-intro">
             <div>
-              <h2>Letters from lately</h2>
+              <h2>Alice: Through The Looking Glass</h2>
               <p>A home for finished notes and works in progress. Open an entry to keep writing or start a new one.</p>
             </div>
             <button type="button" id="new-issue-side" data-admin-only>+ Add New</button>
