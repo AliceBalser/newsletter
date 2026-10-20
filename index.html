@@ -3,15 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Alice: Through The Looking Glass</title>
+    <title>Alice: Through the Looking Glass</title>
     <style>
-      @font-face {
-        font-family: "AliceHeader";
-        src: url("./fonts/CHICK___.ttf") format("truetype");
-        font-weight: normal;
-        font-style: normal;
-        font-display: swap;
-      }
       :root {
         color-scheme: light;
         --ink: #24201d;
@@ -178,7 +171,6 @@
       }
 
       .login-panel h1 {
-        font-family: "AliceHeader", Georgia, serif;
         font-size: clamp(42px, 8vw, 68px);
         font-weight: 400;
         line-height: 0.95;
@@ -275,7 +267,6 @@
       }
 
       .timeline-intro h2 {
-        font-family: "AliceHeader", Georgia, serif;
         font-size: clamp(42px, 9vw, 112px);
         font-weight: 400;
         line-height: 0.95;
@@ -560,7 +551,6 @@
       }
 
       .masthead {
-        font-family: "AliceHeader", Georgia, serif;
         display: grid;
         gap: 8px;
         margin-bottom: 28px;
@@ -828,7 +818,7 @@
       <section class="view active" id="login-view">
         <div class="auth-page">
           <form class="login-panel" id="login-form">
-            <h1>Alice: Through The Looking Glass</h1>
+            <h1>Alice: Through the Looking Glass</h1>
             <p>Sign in to read the timeline or manage newsletter entries.</p>
             <div class="field">
               <label for="login-user">User</label>
@@ -853,7 +843,7 @@
         <div class="timeline-layout">
           <aside class="timeline-intro">
             <div>
-              <h2>Alice: Through The Looking Glass</h2>
+              <h2>Alice: Through the Looking Glass</h2>
               <p>A home for finished notes and works in progress. Open an entry to keep writing or start a new one.</p>
             </div>
             <button type="button" id="new-issue-side" data-admin-only>+ Add New</button>
@@ -1005,17 +995,6 @@
                 <input id="theme-timeline-marker" type="color" data-theme-color="--rose">
               </div>
             </div>
-            <div class="eyebrow">Online Fonts</div>
-            <div class="field">
-              <label for="font-family-name">Font Name</label>
-              <input id="font-family-name" type="text" placeholder="Playfair Display">
-            </div>
-            <div class="button-grid">
-              <button type="button" class="secondary" id="import-font">Import Font</button>
-              <label class="secondary file-button" for="font-file">Import File</label>
-              <input id="font-file" type="file" accept=".ttf,.otf,.woff,.woff2,font/*" hidden>
-            </div>
-            <p class="status" id="font-file-status">No font file selected.</p>
             <div class="eyebrow">Custom Breaks</div>
             <div class="field">
               <label for="custom-break-text">Break Item</label>
@@ -1046,7 +1025,6 @@
     <script>
       const storageKey = "newsletter-studio-issues-v2";
       const themeKey = "newsletter-studio-theme-v1";
-      const fontKey = "newsletter-studio-fonts-v1";
       const breakKey = "newsletter-studio-breaks-v1";
       const authKey = "newsletter-studio-role-v1";
       const passwords = {
@@ -1122,13 +1100,11 @@
         space: "<div class=\"break-space\" contenteditable=\"false\"></div><p><br></p>"
       };
       let issues = [];
-      let customFonts = [];
       let customBreaks = [];
       let activeId = null;
       let lastView = "timeline";
       let role = null;
       let savedRange = null;
-      let pendingFontFile = null;
 
       function isAdmin() {
         return role === "admin";
@@ -1265,73 +1241,37 @@
         applyTheme(theme);
       }
 
-      function saveFonts() {
-        localStorage.setItem(fontKey, JSON.stringify(customFonts));
-      }
-
-      function googleFontUrl(name) {
-        return `https://fonts.googleapis.com/css2?family=${encodeURIComponent(name).replace(/%20/g, "+")}:wght@400;700&display=swap`;
-      }
-
-      function fontFormat(fileName = "") {
-        const extension = fileName.split(".").pop().toLowerCase();
-        if (extension === "ttf") return "truetype";
-        if (extension === "otf") return "opentype";
-        if (extension === "woff") return "woff";
-        if (extension === "woff2") return "woff2";
-        return "";
-      }
-
-      function fontFileNameToLabel(fileName = "") {
-        return fileName
-          .replace(/\.(ttf|otf|woff2?|TTF|OTF|WOFF2?)$/, "")
-          .replace(/[-_]+/g, " ")
-          .trim();
-      }
-
-      function renderFonts() {
-        document.querySelectorAll("[data-imported-font-link]").forEach((link) => link.remove());
-        document.querySelector("#imported-font-faces")?.remove();
-        const fontFaceStyle = document.createElement("style");
-        fontFaceStyle.id = "imported-font-faces";
-        fontFaceStyle.textContent = customFonts
-          .filter((font) => font.dataUrl)
-          .map((font) => {
-            const format = font.format ? ` format("${font.format}")` : "";
-            return `@font-face { font-family: "${font.name.replace(/"/g, '\\"')}"; src: url("${font.dataUrl}")${format}; font-weight: 400 700; font-style: normal; font-display: swap; }`;
-          })
-          .join("\n");
-        document.head.appendChild(fontFaceStyle);
-
-        customFonts.filter((font) => !font.dataUrl).forEach((font) => {
-          const link = document.createElement("link");
-          link.dataset.importedFontLink = "true";
-          link.rel = "stylesheet";
-          link.href = font.url || googleFontUrl(font.name);
-          document.head.appendChild(link);
-        });
-
-        fontSelect.querySelectorAll("[data-custom-font]").forEach((option) => option.remove());
-        customFonts.forEach((font) => {
-          const option = document.createElement("option");
-          option.dataset.customFont = "true";
-          option.value = `'${font.name.replace(/'/g, "\\'")}', sans-serif`;
-          option.textContent = font.name;
-          fontSelect.appendChild(option);
-        });
-      }
-
-      function loadFonts() {
+      // Fonts are managed in fonts/fonts.json, not through the website.
+      async function loadFonts() {
         try {
-          customFonts = JSON.parse(localStorage.getItem(fontKey)) || [];
-        } catch {
-          customFonts = [];
-          localStorage.removeItem(fontKey);
+          const response = await fetch("./fonts/fonts.json", { cache: "no-cache" });
+          if (!response.ok) throw new Error("Font manifest unavailable");
+          const fonts = await response.json();
+          if (!Array.isArray(fonts)) throw new Error("Invalid font list");
+          const css = [];
+          fontSelect.querySelectorAll("[data-custom-font]").forEach(option => option.remove());
+          fonts.forEach((font) => {
+            if (typeof font !== "string" || !/^[^/\\]+\.(woff2?|ttf|otf)$/i.test(font)) return;
+            const family = font.replace(/\.(woff2?|ttf|otf)$/i, "").replace(/[-_]+/g, " ");
+            const format = font.toLowerCase().endsWith(".woff2") ? "woff2" :
+              font.toLowerCase().endsWith(".woff") ? "woff" :
+              font.toLowerCase().endsWith(".otf") ? "opentype" : "truetype";
+            const url = "./fonts/" + encodeURIComponent(font);
+            css.push(`@font-face { font-family: ${JSON.stringify(family)}; src: url(${JSON.stringify(url)}) format("${format}"); font-display: swap; }`);
+            const option = document.createElement("option");
+            option.dataset.customFont = "true";
+            option.value = `"${family.replace(/"/g, "\\\"")}", sans-serif`;
+            option.textContent = family;
+            fontSelect.appendChild(option);
+          });
+          document.querySelector("#repository-font-faces")?.remove();
+          const style = document.createElement("style");
+          style.id = "repository-font-faces";
+          style.textContent = css.join("\n");
+          document.head.appendChild(style);
+        } catch (error) {
+          console.warn("Repository fonts could not be loaded:", error);
         }
-        const before = customFonts.length;
-        customFonts = customFonts.filter((font) => !font.name?.toLowerCase().includes("marley antique"));
-        if (customFonts.length !== before) saveFonts();
-        renderFonts();
       }
 
       function saveBreaks() {
@@ -1738,50 +1678,6 @@
       document.querySelector("#save-issue").addEventListener("click", () => saveActiveIssue(true));
       document.querySelector("#open-settings").addEventListener("click", openSettings);
       document.querySelector("#back-from-settings").addEventListener("click", closeSettings);
-      document.querySelector("#import-font").addEventListener("click", () => {
-        const nameInput = document.querySelector("#font-family-name");
-        const status = document.querySelector("#font-file-status");
-        const name = nameInput.value.trim() || fontFileNameToLabel(pendingFontFile?.name || "");
-        if (!name) return;
-        if (pendingFontFile) {
-          const file = pendingFontFile;
-          const reader = new FileReader();
-          reader.addEventListener("load", () => {
-            customFonts = customFonts.filter((font) => font.name.toLowerCase() !== name.toLowerCase());
-            customFonts.push({
-              name,
-              dataUrl: reader.result,
-              fileName: file.name,
-              format: fontFormat(file.name)
-            });
-            saveFonts();
-            renderFonts();
-            pendingFontFile = null;
-            nameInput.value = "";
-            status.textContent = "Font file imported.";
-          });
-          reader.readAsDataURL(file);
-          return;
-        }
-        if (!customFonts.some((font) => font.name.toLowerCase() === name.toLowerCase())) {
-          customFonts.push({ name, url: googleFontUrl(name) });
-        }
-        saveFonts();
-        renderFonts();
-        nameInput.value = "";
-      });
-      document.querySelector("#font-file").addEventListener("change", (event) => {
-        const file = event.target.files[0];
-        if (!file) return;
-        const nameInput = document.querySelector("#font-family-name");
-        const status = document.querySelector("#font-file-status");
-        pendingFontFile = file;
-        if (!nameInput.value.trim()) {
-          nameInput.value = fontFileNameToLabel(file.name);
-        }
-        status.textContent = `Selected: ${file.name}`;
-        event.target.value = "";
-      });
       document.querySelector("#text-font").addEventListener("change", (event) => {
         applyInlineStyle("fontName", event.target.value || "Georgia");
       });
